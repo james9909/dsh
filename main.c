@@ -11,11 +11,10 @@ int main()
 {
     char buf[512] = {};
     char *args = buf;
-    printf("%% ");
-    while (fgets(buf, sizeof(buf), stdin))
-    {
-        run(args);
+    while (1) {
         printf("%% ");
+        fgets(buf, sizeof(buf), stdin);
+        run(args);
     }
     return 0;
 }
