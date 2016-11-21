@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "builtins.h"
 
 int main()
 {
@@ -22,6 +23,8 @@ int main()
             argl[i] = arg;
         }
         argl[i] = 0;
+
+        handle_builtins(argl);
 
         pid_t n = fork();
         if (n == 0)

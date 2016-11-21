@@ -1,5 +1,5 @@
 all:
-	gcc main.c -o dsh
+	gcc main.c builtins.c -o dsh
 
 clean:
 	rm dsh
