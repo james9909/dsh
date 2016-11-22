@@ -12,8 +12,9 @@ int main()
 {
     char buf[512] = {};
     char *input = buf;
+    load_prompt();
     while (1) {
-        prompt();
+        print_prompt();
         if (fgets(buf, sizeof(buf), stdin) == NULL) {
             break;
         }

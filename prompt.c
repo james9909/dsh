@@ -9,10 +9,25 @@
 #include "colors.h"
 #include "prompt.h"
 
-char PROMPT[] = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {RESET}$ ";
 struct passwd *p;
 
-void prompt() {
+void load_prompt() {
+    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {RESET}$ "; // TODO: read from file?
+    int i, lb, rb;
+    for (i = lb = rb = 0; i < strlen(PROMPT); i++) {
+        if (PROMPT[i] == '{') {
+            lb++;
+        } else if (PROMPT[i] == '}') {
+            rb++;
+        }
+    }
+    if (lb != rb) {
+        printf("Invalid prompt\n");
+        PROMPT = "$ ";
+    }
+}
+
+void print_prompt() {
     int i, length;
     p = getpwuid(getuid());
     for (i = 0; i < strlen(PROMPT); i++) {
@@ -21,7 +36,6 @@ void prompt() {
             while (PROMPT[i+length] != '}') {
                 length++;
             }
-
             char *var = (char *)calloc(length, sizeof(char));
             strncpy(var, PROMPT+i+1, length-1);
             print_variable(var);
