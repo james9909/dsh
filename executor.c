@@ -36,6 +36,12 @@ void remove_spaces(char *argv[512])
 
 void handle_redirect(char *argv[512])
 {
+    /* int use_next_in = 0; */
+    /* int use_next_out = 0; */
+    /* int use_next_err = 0; */
+
+    int append = 0;
+    int outerr = 0;
     int i;
     for (i = 0; argv[i]; ++i)
     {
@@ -44,9 +50,9 @@ void handle_redirect(char *argv[512])
         if (p[0] == '>' ||
            (strlen(p) > 2 && p[1] == '>'))
         {
-            int src;
-            int append = 0;
-            int outerr = 0;
+            int src = -1;
+            append = 0;
+            outerr = 0;
             if (p[0] == '>')
             {
                 src = 1;
@@ -58,6 +64,11 @@ void handle_redirect(char *argv[512])
                     outerr = 1;
                 else
                     src = p[0] - '0';
+                if (src > 2)
+                {
+                    perror("dsh: Bad file descriptor");
+                    exit(1);
+                }
                 p++;
                 p++;
             }
@@ -77,12 +88,26 @@ void handle_redirect(char *argv[512])
                     perror("dsh: Bad file descriptor");
                     exit(1);
                 }
-                dup2(fd, src);
+                if (outerr)
+                {
+                    dup2(fd, 1);
+                    dup2(fd, 2);
+                } else
+                {
+                    dup2(fd, src);
+                }
                 close(fd);
             } else //redirect to file
             {
                 fd = open(p, O_WRONLY|O_CREAT|append, 0644);
-                dup2(fd, src);
+                if (outerr)
+                {
+                    dup2(fd, 1);
+                    dup2(fd, 2);
+                } else
+                {
+                    dup2(fd, src);
+                }
                 close(fd);
             }
             argv[i] = " ";
