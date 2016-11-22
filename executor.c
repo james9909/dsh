@@ -6,9 +6,11 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
+#include "prompt.h"
 #include "executor.h"
 #include "builtins.h"
 
+pid_t pid;
 
 void remove_spaces(char *argv[512])
 {
@@ -119,8 +121,6 @@ void handle_redirect(char *argv[512])
 void run(char *input)
 {
     input[strlen(input)-1] = 0;
-    if (!(*input))
-        return;
 
     char *cmds[512];
     char *argv[512] = {};
@@ -151,18 +151,40 @@ void run(char *input)
         }
         argv[j] = 0;
 
+        if (strlen(*argv) == 0)
+        {
+            continue;
+        }
+
         if (handle_builtins(argv))
             continue;
 
-        pid_t n = fork();
-        if (n == 0)
+        pid = fork();
+        if (pid == 0)
         {
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
+            exit(127);
+        } else
+        {
+            int exit_code;
+            waitpid(pid, &exit_code, 0);
+
+            if (WIFEXITED(exit_code))
+            {
+                set_exit_code(WEXITSTATUS(exit_code));
+            }
+            pid = -1;
         }
-        int status;
-        wait(&status);
+    }
+}
+
+void signal_process(int signo)
+{
+    if (pid > 0)
+    {
+        kill(pid, signo);
     }
 }
