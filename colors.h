@@ -1,3 +1,5 @@
+#pragma once
+
 #define BLUE "\x1b[34m"
 #define GREEN "\x1b[32m"
 #define MAGENTA "\x1b[35m"
