@@ -62,7 +62,7 @@ void handle_redirect(char *argv[512])
                 p++;
             }
             int fd;
-            if (p[1] == '>')
+            if (p[0] == '>')
             {
                 append = O_APPEND;
                 p++;
