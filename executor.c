@@ -4,9 +4,33 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #include "executor.h"
 #include "builtins.h"
+
+
+void remove_spaces(char *argv[512])
+{
+    int i;
+    for (i = 0; argv[i]; ++i)
+    {
+        if (strcmp(argv[i], " ") == 0)
+        {
+            if (!argv[i+1])
+            {
+                argv[i] = 0;
+                continue;
+            }
+            int j;
+            for (j = i+1; argv[j]; ++j)
+            {
+                argv[j-1] = argv[j];
+            }
+            argv[j] = 0;
+        }
+    }
+}
 
 void handle_pipes(char *cmd, int num_pipes)
 {
@@ -53,6 +77,45 @@ void handle_pipes(char *cmd, int num_pipes)
     }
 }
 
+void handle_redirect(char *argv[512])
+{
+    int i;
+    for (i = 0; argv[i]; ++i)
+    {
+        //Redirect stdout
+        if (strlen(argv[i]) > 2 && argv[i][1] == '>')
+        {
+            char src = argv[i][0];
+            int fd;
+            char *dst = argv[i]+2;
+            int append = 0;
+            if (argv[i][2] == '>')
+            {
+                append = O_APPEND;
+                dst = argv[i]+3;
+            }
+            //Redirect to stdin/stdout/stderr
+            if (dst[0] == '&')
+            {
+                fd = dst[1] - '0';
+                if (fd > 2 || dst[2] != '\0')
+                {
+                    perror("dsh: Bad file descriptor");
+                    exit(1);
+                }
+                dup2(fd, 1);
+                close(fd);
+            } else //redirect to file
+            {
+                fd = open(dst, O_WRONLY|O_CREAT|append, 0644);
+                dup2(fd, 1);
+                close(fd);
+            }
+            argv[i] = " ";
+        }
+    }
+}
+
 void run(char *input)
 {
     input[strlen(input)-1] = 0;
@@ -94,6 +157,8 @@ void run(char *input)
         pid_t n = fork();
         if (n == 0)
         {
+            handle_redirect(argv);
+            remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
         }
