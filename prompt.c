@@ -17,7 +17,7 @@ void set_exit_code(int n) {
 }
 
 void load_prompt() {
-    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {sign}{RESET} "; // TODO: read from file?
+    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {GREEN}{git_info} {sign}{RESET} "; // TODO: read from file?
     int i, lb, rb;
     for (i = lb = rb = 0; i < strlen(PROMPT); i++) {
         if (PROMPT[i] == '{') {
@@ -29,6 +29,38 @@ void load_prompt() {
     if (lb != rb) {
         printf("Invalid prompt\n");
         PROMPT = "$ ";
+    }
+}
+
+void git_info() {
+    FILE *fp;
+    char output[1024];
+
+    fp = popen("git status 2> /dev/null", "r");
+    if (fp) {
+        fgets(output, sizeof(output), fp);
+        if (strlen(output) == 0) {
+            return;
+        }
+    }
+
+    fp = popen("git branch 2> /dev/null | grep -Po \"\\* \\K(.+)\"", "r");
+    if (fp) {
+        fgets(output, sizeof(output), fp);
+        output[strlen(output)-1] = 0;
+        printf("(%s ", output);
+        output[0] = 0;
+    }
+
+    fp = popen("git status -s 2> /dev/null", "r");
+    if (fp) {
+        fgets(output, sizeof(output), fp);
+        if (strlen(output) == 0) {
+            printf("✔");
+        } else {
+            printf("✘");
+        }
+        printf(")");
     }
 }
 
@@ -90,6 +122,8 @@ void print_variable(char *var) {
         } else {
             printf(RED "$" RESET);
         }
+    } else if (strcmp(var, "git_info") == 0) {
+        git_info();
     } else if (strcmp(var, "BLUE") == 0) {
         printf(BLUE);
     } else if (strcmp(var, "GREEN") == 0) {
