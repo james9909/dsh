@@ -1,3 +1,4 @@
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +10,13 @@
 #include "executor.h"
 #include "prompt.h"
 
+sigjmp_buf ctrlc;
+
 static void handler(int signo) {
+    if (signo == SIGINT) {
+        printf("\n");
+        siglongjmp(ctrlc, 1);
+    }
     signal_process(signo);
 }
 
@@ -20,6 +27,9 @@ int main()
     char buf[512] = {};
     char *input = buf;
     load_prompt();
+
+    sigsetjmp(ctrlc, 1);
+
     while (1) {
         print_prompt();
 
