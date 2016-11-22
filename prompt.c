@@ -6,9 +6,10 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "colors.h"
 #include "prompt.h"
 
-char PROMPT[] = "[{time}] {username}@{host} [{pwd}] $ ";
+char PROMPT[] = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {RESET}$ ";
 struct passwd *p;
 
 void prompt() {
@@ -64,5 +65,17 @@ void print_variable(char *var) {
             condensed += len;
         }
         printf("%s", condensed);
+    } else if (strcmp(var, "BLUE") == 0) {
+        printf(BLUE);
+    } else if (strcmp(var, "GREEN") == 0) {
+        printf(GREEN);
+    } else if (strcmp(var, "MAGENTA") == 0) {
+        printf(MAGENTA);
+    } else if (strcmp(var, "RED") == 0) {
+        printf(RED);
+    } else if (strcmp(var, "RESET") == 0) {
+        printf(RESET);
+    } else if (strcmp(var, "YELLOW") == 0) {
+        printf(YELLOW);
     }
 }
