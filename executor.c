@@ -58,8 +58,8 @@ void handle_pipes(char *cmd, int num_pipes)
     for (i = 0; pipe_cmds[i]; ++i)
     {
         //handle_builtins(&pipe_cmds[i]);
-        pid_t n = fork();
-        if (n == 0)
+        pid = fork();
+        if (pid == 0)
         {
             if (i != 0)
                 dup2(pfds[(i-1)*2], 0);
@@ -69,13 +69,22 @@ void handle_pipes(char *cmd, int num_pipes)
             for (j = 0; pipe_cmds[i]; ++j)
                 argv[j] = strsep(&pipe_cmds[i], " ");
             execvp(argv[0], argv);
+            printf("dsh: Command not found: %s\n", argv[0]);
+            exit(127);
         }
         if (i != 0)
             close(pfds[(i-1)*2]);
         if (i != num_pipes)
             close(pfds[i*2+1]);
-        int status;
-        wait(&status);
+
+        int exit_code;
+        waitpid(pid, &exit_code, 0);
+
+        if (WIFEXITED(exit_code))
+        {
+            set_exit_code(WEXITSTATUS(exit_code));
+        }
+        pid = -1;
     }
 }
 
