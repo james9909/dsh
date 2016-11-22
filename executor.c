@@ -8,6 +8,8 @@
 #include "executor.h"
 #include "builtins.h"
 
+pid_t pid;
+
 void handle_pipes(char *cmd, int num_pipes)
 {
     char *pipe_cmds[512];
@@ -91,13 +93,19 @@ void run(char *input)
         if (handle_builtins(argv))
             continue;
 
-        pid_t n = fork();
-        if (n == 0)
-        {
+        pid = fork();
+        if (pid == 0) {
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
         }
         int status;
         wait(&status);
+        pid = -1;
+    }
+}
+
+void signal_process(int signo) {
+    if (pid > 0) {
+        kill(pid, signo);
     }
 }
