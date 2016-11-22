@@ -10,6 +10,9 @@
 
 void run(char *input) {
     input[strlen(input)-1] = 0;
+    if (!(*input)) {
+        return;
+    }
 
     int num_commands = 1;
     int i, j;
@@ -34,6 +37,7 @@ void run(char *input) {
         pid_t n = fork();
         if (n == 0) {
             execvp(argv[0], argv);
+            printf("dsh: Command not found: %s\n", argv[0]);
         }
         int status;
         wait(&status);

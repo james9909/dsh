@@ -11,11 +11,11 @@
 int main()
 {
     char buf[512] = {};
-    char *args = buf;
+    char *input = buf;
     while (1) {
         prompt();
-        fgets(buf, sizeof(buf), stdin);
-        run(args);
+        fgets(input, sizeof(input), stdin);
+        run(input);
     }
     return 0;
 }
