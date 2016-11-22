@@ -10,9 +10,14 @@
 #include "prompt.h"
 
 struct passwd *p;
+int exit_code;
+
+void set_exit_code(int n) {
+    exit_code = n;
+}
 
 void load_prompt() {
-    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {RESET}$ "; // TODO: read from file?
+    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {sign}{RESET} "; // TODO: read from file?
     int i, lb, rb;
     for (i = lb = rb = 0; i < strlen(PROMPT); i++) {
         if (PROMPT[i] == '{') {
@@ -79,6 +84,12 @@ void print_variable(char *var) {
             condensed += len;
         }
         printf("%s", condensed);
+    } else if (strcmp(var, "sign") == 0) {
+        if (exit_code == 0) {
+            printf(GREEN "$" RESET);
+        } else {
+            printf(RED "$" RESET);
+        }
     } else if (strcmp(var, "BLUE") == 0) {
         printf(BLUE);
     } else if (strcmp(var, "GREEN") == 0) {

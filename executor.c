@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "prompt.h"
 #include "executor.h"
 #include "builtins.h"
 
@@ -97,10 +98,16 @@ void run(char *input)
         if (pid == 0) {
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
+            exit(127);
+        } else {
+            int exit_code;
+            waitpid(pid, &exit_code, 0);
+
+            if (WIFEXITED(exit_code)) {
+                set_exit_code(WEXITSTATUS(exit_code));
+            }
+            pid = -1;
         }
-        int status;
-        wait(&status);
-        pid = -1;
     }
 }
 
