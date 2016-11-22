@@ -87,6 +87,23 @@ void handle_redirect(char *argv[512])
             }
             argv[i] = " ";
         }
+        if (p[0] == '<' ||
+           ((strlen(p) > 2 && p[1] == '<')))
+        {
+            if (p[0] != '<' && !(p[0] == '0' && p[1] == '<'))
+            {
+                perror("dsh: Bad file descriptor");
+                exit(1);
+            }
+            int src = 0;
+            if (p[0] != '<')
+                p++;
+            p++;
+            int fd = open(p, O_RDONLY);
+            dup2(fd, src);
+            close(fd);
+            argv[i] = " ";
+        }
     }
 }
 
