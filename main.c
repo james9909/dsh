@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <readline/readline.h>
 
 #include "builtins.h"
 #include "executor.h"
@@ -24,20 +25,21 @@ int main()
 {
     signal(SIGINT, handler);
 
-    char buf[512] = {};
-    char *input = buf;
+    char *input;
+    char *prompt;
     load_prompt();
 
     sigsetjmp(ctrlc, 1);
 
     while (1) {
-        print_prompt();
+        prompt = get_prompt();
+        input = readline(prompt);
+        free(prompt);
 
-        // TODO: make fgets stop blocking SIGINT
-        if (fgets(buf, sizeof(buf), stdin) == NULL) {
-            exit(0);
-        }
+        if (!input) break;
+
         run(input);
+        free(input);
     }
     return 0;
 }

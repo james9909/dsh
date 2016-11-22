@@ -190,8 +190,6 @@ void handle_pipes(char *cmd, int num_pipes)
 
 void run(char *input)
 {
-    input[strlen(input)-1] = 0;
-
     char *cmds[512];
     char *argv[512] = {};
     int i,j;

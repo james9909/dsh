@@ -32,15 +32,16 @@ void load_prompt() {
     }
 }
 
-void git_info() {
+char *git_info() {
     FILE *fp;
     char output[1024];
+    char *info = (char *) calloc(128, sizeof(char));
 
     fp = popen("git status 2> /dev/null", "r");
     if (fp) {
         fgets(output, sizeof(output), fp);
         if (strlen(output) == 0) {
-            return;
+            return info;
         }
     }
 
@@ -48,7 +49,7 @@ void git_info() {
     if (fp) {
         fgets(output, sizeof(output), fp);
         output[strlen(output)-1] = 0;
-        printf("(%s ", output);
+        sprintf(info, "(%s ", output);
         output[0] = 0;
     }
 
@@ -56,17 +57,18 @@ void git_info() {
     if (fp) {
         fgets(output, sizeof(output), fp);
         if (strlen(output) == 0) {
-            printf("✔");
+            strcat(info, "✔)");
         } else {
-            printf("✘");
+            strcat(info, "✘)");
         }
-        printf(")");
     }
+    return info;
 }
 
-void print_prompt() {
+char *get_prompt() {
     int i, length;
     p = getpwuid(getuid());
+    char *prompt = (char *) calloc(1024, sizeof(char));
     for (i = 0; i < strlen(PROMPT); i++) {
         if (PROMPT[i] == '{') {
             length = 1;
@@ -75,66 +77,69 @@ void print_prompt() {
             }
             char *var = (char *)calloc(length, sizeof(char));
             strncpy(var, PROMPT+i+1, length-1);
-            print_variable(var);
+            char *value = get_variable(var);
+            strcat(prompt, value);
             free(var);
+            free(value);
 
             i += length;
         } else {
-            printf("%c", PROMPT[i]);
+            strncat(prompt, &PROMPT[i], 1);
         }
     }
+    return prompt;
 }
 
-void print_variable(char *var) {
+char *get_variable(char *var) {
     time_t raw;
     time(&raw);
     struct tm *timeinfo = localtime(&raw);
+    char *value = (char *) calloc(256, sizeof(char));
+
     if (strcmp(var, "time") == 0) {
-        printf("%02d:%02d",
+        sprintf(value, "%02d:%02d",
             timeinfo->tm_hour % 12,
             timeinfo->tm_min
             );
     } else if (strcmp(var, "username") == 0) {
         if (!p) {
-            printf("unknown");
+            strcpy(value, "unknown");
         } else {
-            printf("%s", p->pw_name);
+            strcpy(value, p->pw_name);
         }
     } else if (strcmp(var, "host") == 0) {
-        char host[256];
-        gethostname(host, sizeof(host));
-        printf("%s", host);
+        gethostname(value, 256);
     } else if (strcmp(var, "pwd") == 0) {
         char cwd[256];
         char *home = p->pw_dir;
         getcwd(cwd, sizeof(cwd));
 
-        char *condensed = cwd;
-        long len = strlen(home)-1;
+        long len = strlen(home);
         if (strncmp(cwd, home, len) == 0) {
-            condensed[len] = '~';
-            condensed += len;
+            sprintf(value, "~%s", &cwd[len]);
+        } else {
+            strcpy(value, cwd);
         }
-        printf("%s", condensed);
     } else if (strcmp(var, "sign") == 0) {
         if (exit_code == 0) {
-            printf(GREEN "$" RESET);
+            strcpy(value, GREEN "$" RESET);
         } else {
-            printf(RED "$" RESET);
+            strcpy(value, RED "$" RESET);
         }
     } else if (strcmp(var, "git_info") == 0) {
-        git_info();
+        value = git_info();
     } else if (strcmp(var, "BLUE") == 0) {
-        printf(BLUE);
+        strcpy(value, BLUE);
     } else if (strcmp(var, "GREEN") == 0) {
-        printf(GREEN);
+        strcpy(value, GREEN);
     } else if (strcmp(var, "MAGENTA") == 0) {
-        printf(MAGENTA);
+        strcpy(value, MAGENTA);
     } else if (strcmp(var, "RED") == 0) {
-        printf(RED);
+        strcpy(value, RED);
     } else if (strcmp(var, "RESET") == 0) {
-        printf(RESET);
+        strcpy(value, RESET);
     } else if (strcmp(var, "YELLOW") == 0) {
-        printf(YELLOW);
+        strcpy(value, YELLOW);
     }
+    return value;
 }
