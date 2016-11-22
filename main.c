@@ -6,13 +6,14 @@
 
 #include "builtins.h"
 #include "executor.h"
+#include "prompt.h"
 
 int main()
 {
     char buf[512] = {};
     char *args = buf;
     while (1) {
-        printf("%% ");
+        prompt();
         fgets(buf, sizeof(buf), stdin);
         run(args);
     }
