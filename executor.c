@@ -32,7 +32,8 @@ void run(char *input) {
         }
         argv[j] = 0;
 
-        handle_builtins(argv);
+        if (handle_builtins(argv))
+            continue;
 
         pid_t n = fork();
         if (n == 0) {

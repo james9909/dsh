@@ -1,3 +1,3 @@
 #pragma once
 
-void handle_builtins(char **argl);
+int handle_builtins(char **argl);
