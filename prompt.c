@@ -20,10 +20,12 @@ void prompt() {
             while (PROMPT[i+length] != '}') {
                 length++;
             }
-            char *var = (char *)malloc(length*sizeof(char));
+
+            char *var = (char *)calloc(length, sizeof(char));
             strncpy(var, PROMPT+i+1, length-1);
             print_variable(var);
             free(var);
+
             i += length;
         } else {
             printf("%c", PROMPT[i]);
