@@ -34,6 +34,62 @@ void remove_spaces(char *argv[512])
     }
 }
 
+void handle_redirect(char *argv[512])
+{
+    int i;
+    for (i = 0; argv[i]; ++i)
+    {
+        char *p = argv[i];
+        //Redirect stdout
+        if (p[0] == '>' ||
+           (strlen(p) > 2 && p[1] == '>'))
+        {
+            int src;
+            int append = 0;
+            int outerr = 0;
+            if (p[0] == '>')
+            {
+                src = 1;
+                p++;
+            }
+            else
+            {
+                if (p[0] == '&')
+                    outerr = 1;
+                else
+                    src = p[0] - '0';
+                p++;
+                p++;
+            }
+            int fd;
+            if (p[1] == '>')
+            {
+                append = O_APPEND;
+                p++;
+            }
+            //Redirect to stdin/stdout/stderr
+            if (p[0] == '&')
+            {
+                p++;
+                fd = p[0] - '0';
+                if (fd > 2 || p[1] != '\0')
+                {
+                    perror("dsh: Bad file descriptor");
+                    exit(1);
+                }
+                dup2(fd, src);
+                close(fd);
+            } else //redirect to file
+            {
+                fd = open(p, O_WRONLY|O_CREAT|append, 0644);
+                dup2(fd, src);
+                close(fd);
+            }
+            argv[i] = " ";
+        }
+    }
+}
+
 void handle_pipes(char *cmd, int num_pipes)
 {
     char *pipe_cmds[512];
@@ -68,6 +124,8 @@ void handle_pipes(char *cmd, int num_pipes)
             int j;
             for (j = 0; pipe_cmds[i]; ++j)
                 argv[j] = strsep(&pipe_cmds[i], " ");
+            handle_redirect(argv);
+            remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
@@ -85,45 +143,6 @@ void handle_pipes(char *cmd, int num_pipes)
             set_exit_code(WEXITSTATUS(exit_code));
         }
         pid = -1;
-    }
-}
-
-void handle_redirect(char *argv[512])
-{
-    int i;
-    for (i = 0; argv[i]; ++i)
-    {
-        //Redirect stdout
-        if (strlen(argv[i]) > 2 && argv[i][1] == '>')
-        {
-            char src = argv[i][0];
-            int fd;
-            char *dst = argv[i]+2;
-            int append = 0;
-            if (argv[i][2] == '>')
-            {
-                append = O_APPEND;
-                dst = argv[i]+3;
-            }
-            //Redirect to stdin/stdout/stderr
-            if (dst[0] == '&')
-            {
-                fd = dst[1] - '0';
-                if (fd > 2 || dst[2] != '\0')
-                {
-                    perror("dsh: Bad file descriptor");
-                    exit(1);
-                }
-                dup2(fd, 1);
-                close(fd);
-            } else //redirect to file
-            {
-                fd = open(dst, O_WRONLY|O_CREAT|append, 0644);
-                dup2(fd, 1);
-                close(fd);
-            }
-            argv[i] = " ";
-        }
     }
 }
 
