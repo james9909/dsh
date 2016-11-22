@@ -59,8 +59,6 @@ void handle_pipes(char *cmd, int num_pipes)
 void run(char *input)
 {
     input[strlen(input)-1] = 0;
-    if (!(*input))
-        return;
 
     char *cmds[512];
     char *argv[512] = {};
@@ -90,6 +88,10 @@ void run(char *input)
             argv[j] = strsep(&cmds[i], " ");
         }
         argv[j] = 0;
+
+        if (strlen(*argv) == 0) {
+            continue;
+        }
 
         if (handle_builtins(argv))
             continue;
