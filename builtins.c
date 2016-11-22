@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,9 +16,16 @@ int handle_builtins(char* argl[])
     }
     if (strcmp(argl[0], "cd") == 0)
     {
-        int status = chdir(expand(argl[1]));
+        char *path;
+        if (sizeof(&argl) / sizeof(char *) == 1) {
+            path = "~";
+        } else {
+            path = argl[1];
+        }
+
+        int status = chdir(expand(path));
         if (status == -1) {
-            printf("cd: no such file or directory: %s\n", argl[1]);
+            printf("cd: %s: %s\n", strerror(errno), path);
         }
         return 1;
     }
