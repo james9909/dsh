@@ -14,7 +14,7 @@ int main()
     char *input = buf;
     while (1) {
         prompt();
-        fgets(input, sizeof(input), stdin);
+        fgets(buf, sizeof(buf), stdin);
         run(input);
     }
     return 0;
