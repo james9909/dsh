@@ -133,7 +133,7 @@ void handle_redirect(char *argv[512])
 void handle_pipes(char *cmd, int num_pipes)
 {
     char *pipe_cmds[512] = {};
-    int pfds[2*num_pipes] = {};
+    int pfds[2*num_pipes];
     int i = 0;
     for (i = 0; i < num_pipes; ++i)
     {
