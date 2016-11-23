@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <readline/history.h>
 #include <readline/readline.h>
 
 #include "builtins.h"
@@ -37,6 +38,7 @@ int main()
         free(prompt);
 
         if (!input) break;
+        if (input[0] != 0) add_history(input);
 
         run(input);
         free(input);
