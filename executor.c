@@ -132,8 +132,8 @@ void handle_redirect(char *argv[512])
 
 void handle_pipes(char *cmd, int num_pipes)
 {
-    char *pipe_cmds[512];
-    int pfds[2*num_pipes];
+    char *pipe_cmds[512] = {};
+    int pfds[2*num_pipes] = {};
     int i = 0;
     for (i = 0; i < num_pipes; ++i)
     {
@@ -189,7 +189,7 @@ void handle_pipes(char *cmd, int num_pipes)
 
 void run(char *input)
 {
-    char *cmds[512];
+    char *cmds[512] = {};
     char *argv[512] = {};
     int i,j;
     for (i = 0; cmds[i] = strsep(&input, ";"); ++i)
