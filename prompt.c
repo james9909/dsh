@@ -40,6 +40,7 @@ char *git_info() {
     fp = popen("git status 2> /dev/null", "r");
     if (fp) {
         fgets(output, sizeof(output), fp);
+        pclose(fp);
         if (strlen(output) == 0) {
             return info;
         }
@@ -49,6 +50,8 @@ char *git_info() {
     fp = popen("git branch 2> /dev/null | grep -Po \"\\* \\K(.+)\"", "r");
     if (fp) {
         fgets(output, sizeof(output), fp);
+        pclose(fp);
+
         output[strlen(output)-1] = 0;
         sprintf(info, "(%s ", output);
         output[0] = 0;
@@ -57,6 +60,8 @@ char *git_info() {
     fp = popen("git status -s 2> /dev/null", "r");
     if (fp) {
         fgets(output, sizeof(output), fp);
+        pclose(fp);
+
         if (strlen(output) == 0) {
             strcat(info, "✔)");
         } else {
