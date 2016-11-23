@@ -25,17 +25,21 @@ void remove_spaces(char *argv[512])
                 continue;
             }
             int j;
-            for (j = i+1; argv[j]; ++j)
+            for (j = i; argv[j+1]; ++j)
             {
-                argv[j-1] = argv[j];
+                argv[j] = argv[j+1];
             }
             argv[j] = 0;
+            i--;
         }
     }
 }
 
 void handle_redirect(char *argv[512])
 {
+    int use_stdin_next = 0;
+    int use_stdout_next = 0;
+    int use_stderr_next = 0;
 
     int append = 0;
     int outerr = 0;
@@ -43,6 +47,30 @@ void handle_redirect(char *argv[512])
     for (i = 0; argv[i]; ++i)
     {
         char *p = argv[i];
+
+        if (use_stdout_next || use_stderr_next)
+        {
+            int fd = open(p, O_WRONLY|O_CREAT|append, 0644);
+            if (use_stdout_next)
+                dup2(fd, STDOUT_FILENO);
+            if (use_stderr_next)
+                dup2(fd, STDERR_FILENO);
+            close(fd);
+            argv[i] = " ";
+            use_stdout_next = 0;
+            use_stderr_next = 0;
+            append = 0;
+            continue;
+        }
+        if (use_stdin_next)
+        {
+            int fd = open(p, O_RDONLY);
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+            argv[i] = " ";
+            continue;
+        }
+
         //Redirect stdout
         if (p[0] == '>' ||
            (strlen(p) > 2 && p[1] == '>'))
@@ -52,7 +80,7 @@ void handle_redirect(char *argv[512])
             outerr = 0;
             if (p[0] == '>')
             {
-                src = 1;
+                src = STDOUT_FILENO;
                 p++;
             }
             else
@@ -74,6 +102,21 @@ void handle_redirect(char *argv[512])
             {
                 append = O_APPEND;
                 p++;
+            }
+            if (!p[0]) //NOT for '&', only files
+            {
+                if (outerr)
+                {
+                    use_stdout_next = 1;
+                    use_stderr_next = 1;
+                }
+                if (src == STDOUT_FILENO)
+                    use_stdout_next = 1;
+                if (src == STDERR_FILENO)
+                    use_stderr_next = 1;
+                argv[i] = " ";
+                outerr = 0;
+                continue;
             }
             //Redirect to stdin/stdout/stderr
             if (p[0] == '&')
@@ -108,6 +151,8 @@ void handle_redirect(char *argv[512])
                 close(fd);
             }
             argv[i] = " ";
+            append = 0;
+            outerr = 0;
             continue;
         }
         if (p[0] == '<' ||
@@ -115,13 +160,20 @@ void handle_redirect(char *argv[512])
         {
             if (p[0] != '<' && !(p[0] == '0' && p[1] == '<'))
             {
+                fprintf(stderr, "asd\n");
                 perror("dsh: Bad file descriptor");
                 exit(1);
             }
-            int src = 0;
+            int src = STDIN_FILENO;
             if (p[0] != '<')
                 p++;
             p++;
+            if (!p[0])
+            {
+                use_stdin_next = 1;
+                argv[i] = " ";
+                continue;
+            }
             int fd = open(p, O_RDONLY);
             dup2(fd, src);
             close(fd);
