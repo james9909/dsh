@@ -76,7 +76,8 @@ void combine_quoted(char *argv[512])
             }
             char *tmp = (char*)malloc(size*sizeof(char));
             strcpy(tmp, argv[di]);
-            free(argv[di]);
+            if (di != i)
+                free(argv[di]);
             argv[di] = tmp;
             for (j = di+1; j <= i; ++j)
             {
@@ -102,7 +103,8 @@ void combine_quoted(char *argv[512])
             }
             char *tmp = (char*)malloc(size*sizeof(char));
             strcpy(tmp, argv[si]);
-            free(argv[si]);
+            if (si != i)
+                free(argv[si]);
             argv[si] = tmp;
             for (j = si+1; j <= i; ++j)
             {
