@@ -6,12 +6,12 @@ Features:
 * Parsing of multiple commands in one line
 * Bash-like keyboard shortcuts
 * Tab completion
+* Quoted args
 * Support for redirection
 * Support for piping together 2 or more commands
 * Customizeable prompt
 
 TODO:
-* Make quotes work properly
 * Add support for globs
 
 Attempted:
@@ -79,16 +79,35 @@ Handles the execution of commands
 
 ```c
 
-/* Trims all spaces from a string. */
+/*
+ * Trims all single-space strings from a string array
+ * Other functions set arguments to single space as a means of removal
+ * This function allows that to work.
+ */
 void remove_spaces(char *argv[512]);
 
-/* Runs a command that contains a redirection */
+/*
+ * Looks for args with quotes in them
+ * and combines them into a single arg.
+ * Also copies everything over to heap
+ * (must be manually freed).
+ */
+void combine_quoted(char *argv[512]);
+
+/*
+ * Check if any redirection needs to be done,
+ * and perform them accordingly
+ */
 void handle_redirect(char *argv[512]);
 
-/* Runs a command that contains pipes */
+/*
+ * Runs commands that contain pipes.
+ * Mirrors the normal program flow but
+ * pipes stdin/stdout properly
+ */
 void handle_pipes(char *cmd, int num_pipes);
 
-/* Runs a command, handling pipes and redirects */
+/* Runs a command */
 void run(char *input);
 
 /* Sends a signal to the currently running process, if it exists */
