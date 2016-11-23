@@ -34,7 +34,7 @@ void load_prompt() {
 
 char *git_info() {
     FILE *fp;
-    char output[1024];
+    char output[1024] = {};
     char *info = (char *) calloc(128, sizeof(char));
 
     fp = popen("git status 2> /dev/null", "r");
@@ -43,6 +43,7 @@ char *git_info() {
         if (strlen(output) == 0) {
             return info;
         }
+        output[0] = 0;
     }
 
     fp = popen("git branch 2> /dev/null | grep -Po \"\\* \\K(.+)\"", "r");
@@ -127,6 +128,7 @@ char *get_variable(char *var) {
             strcpy(value, RED "$" RESET);
         }
     } else if (strcmp(var, "git_info") == 0) {
+        free(value);
         value = git_info();
     } else if (strcmp(var, "BLUE") == 0) {
         strcpy(value, BLUE);
