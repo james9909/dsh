@@ -36,6 +36,7 @@ void remove_spaces(char *argv[512])
 
 void handle_redirect(char *argv[512])
 {
+
     int append = 0;
     int outerr = 0;
     int i;
@@ -86,7 +87,7 @@ void handle_redirect(char *argv[512])
                 }
                 if (outerr)
                 {
-                    dup2(fd, STDIN_FILENO);
+                    dup2(fd, STDOUT_FILENO);
                     dup2(fd, STDERR_FILENO);
                 } else
                 {
