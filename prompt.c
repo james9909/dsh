@@ -20,9 +20,9 @@ void load_prompt() {
     PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {GREEN}{git_info} {sign}{RESET} "; // TODO: read from file?
     int i, lb, rb;
     for (i = lb = rb = 0; i < strlen(PROMPT); i++) {
-        if (PROMPT[i] == '{') {
+        if (PROMPT[i] == '{' && (i == 0 || PROMPT[i-1] != '\\')) {
             lb++;
-        } else if (PROMPT[i] == '}') {
+        } else if (PROMPT[i] == '}' && (i == 0 || PROMPT[i-1] != '\\')) {
             rb++;
         }
     }
@@ -76,9 +76,9 @@ char *get_prompt() {
     p = getpwuid(getuid());
     char *prompt = (char *) calloc(1024, sizeof(char));
     for (i = 0; i < strlen(PROMPT); i++) {
-        if (PROMPT[i] == '{') {
+        if (PROMPT[i] == '{' && (i == 0 || PROMPT[i-1] != '\\')) {
             length = 1;
-            while (PROMPT[i+length] != '}') {
+            while (PROMPT[i+length] != '}' && PROMPT[i+length-1] != '\\') {
                 length++;
             }
             char *var = (char *)calloc(length, sizeof(char));
@@ -89,7 +89,7 @@ char *get_prompt() {
             free(value);
 
             i += length;
-        } else {
+        } else if (PROMPT[i] != '\\') {
             strncat(prompt, &PROMPT[i], 1);
         }
     }
