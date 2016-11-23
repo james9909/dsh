@@ -36,10 +36,6 @@ void remove_spaces(char *argv[512])
 
 void handle_redirect(char *argv[512])
 {
-    /* int use_next_in = 0; */
-    /* int use_next_out = 0; */
-    /* int use_next_err = 0; */
-
     int append = 0;
     int outerr = 0;
     int i;
@@ -111,6 +107,7 @@ void handle_redirect(char *argv[512])
                 close(fd);
             }
             argv[i] = " ";
+            continue;
         }
         if (p[0] == '<' ||
            ((strlen(p) > 2 && p[1] == '<')))
@@ -128,6 +125,7 @@ void handle_redirect(char *argv[512])
             dup2(fd, src);
             close(fd);
             argv[i] = " ";
+            continue;
         }
     }
 }
@@ -152,7 +150,7 @@ void handle_pipes(char *cmd, int num_pipes)
             pipe_cmds[i][j] = 0;
         }
     }
-    char *argv[512];
+    char *argv[512] = {};
     for (i = 0; pipe_cmds[i]; ++i)
     {
         //handle_builtins(&pipe_cmds[i]);
@@ -172,13 +170,14 @@ void handle_pipes(char *cmd, int num_pipes)
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
         }
+
+        int exit_code;
+        waitpid(pid, &exit_code, 0);
+
         if (i != 0)
             close(pfds[(i-1)*2]);
         if (i != num_pipes)
             close(pfds[i*2+1]);
-
-        int exit_code;
-        waitpid(pid, &exit_code, 0);
 
         if (WIFEXITED(exit_code))
         {
