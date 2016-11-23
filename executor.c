@@ -35,6 +35,87 @@ void remove_spaces(char *argv[512])
     }
 }
 
+void combine_quoted(char *argv[512])
+{
+    int dquote = 0;
+    int squote = 0;
+    int dquote_args[512] = {};
+    int squote_args[512] = {};
+    int di = 0;
+    int si = 0;
+
+    int i;
+    for (i = 0; argv[i]; ++i)
+    {
+        char *p = argv[i];
+        if (p[0] == '"')
+        {
+            dquote_args[di++] = i;
+            argv[i]++;
+        }
+        if (p[0] == '\'')
+        {
+            squote_args[si++] = i;
+            argv[i]++;
+        }
+        if (p[strlen(p)-1] == '"')
+        {
+            if (di == 0)
+            {
+                perror("dsh: Ill-formed string");
+                exit(1);
+            }
+            p[strlen(p)-1] = 0;
+            printf(":: %s\n", p);
+            printf(":: %d\n", di);
+            int size = 0;
+            int j;
+            for (j = di; j <= i; ++j)
+            {
+                size += strlen(argv[j]);
+            }
+            char *tmp = (char*)malloc(size*sizeof(char));
+            strcpy(tmp, argv[di]);
+            free(argv[di]);
+            argv[di] = tmp;
+            for (j = di+1; j <= i; ++j)
+            {
+                strcat(argv[di], " ");
+                strcat(argv[di], argv[j]);
+                argv[j] = " ";
+            }
+            dquote_args[--di] = -1;
+        }
+        if (p[strlen(p)-1] == '\'')
+        {
+            if (si == 0)
+            {
+                perror("dsh: Ill-formed string");
+                exit(1);
+            }
+            p[strlen(p)-1] = 0;
+            int size = 0;
+            int j;
+            for (j = si; j <= i; ++j)
+            {
+                size += strlen(argv[j]);
+            }
+            char *tmp = (char*)malloc(size*sizeof(char));
+            strcpy(tmp, argv[si]);
+            free(argv[si]);
+            argv[si] = tmp;
+            for (j = si+1; j <= i; ++j)
+            {
+                strcat(argv[si], " ");
+                strcat(argv[si], argv[j]);
+                argv[j] = " ";
+            }
+            squote_args[--si] = -1;
+        }
+        argv[i] = strdup(argv[i]);
+    }
+}
+
 void handle_redirect(char *argv[512])
 {
     int use_stdin_next = 0;
@@ -160,7 +241,6 @@ void handle_redirect(char *argv[512])
         {
             if (p[0] != '<' && !(p[0] == '0' && p[1] == '<'))
             {
-                fprintf(stderr, "asd\n");
                 perror("dsh: Bad file descriptor");
                 exit(1);
             }
@@ -223,7 +303,11 @@ void handle_pipes(char *cmd, int num_pipes)
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
         }
-
+        int j;
+        for (j = 0; argv[j]; ++j)
+        {
+            free(argv[j]);
+        }
         int exit_code;
         waitpid(pid, &exit_code, 0);
 
@@ -270,6 +354,7 @@ void run(char *input)
             argv[j] = strsep(&cmds[i], " ");
         }
         argv[j] = 0;
+        combine_quoted(argv);
 
         if (strlen(*argv) == 0)
         {
@@ -287,17 +372,19 @@ void run(char *input)
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
-        } else
-        {
-            int exit_code;
-            waitpid(pid, &exit_code, 0);
-
-            if (WIFEXITED(exit_code))
-            {
-                set_exit_code(WEXITSTATUS(exit_code));
-            }
-            pid = -1;
         }
+        for (j = 0; argv[j]; ++j)
+        {
+            free(argv[j]);
+        }
+        int exit_code;
+        waitpid(pid, &exit_code, 0);
+
+        if (WIFEXITED(exit_code))
+        {
+            set_exit_code(WEXITSTATUS(exit_code));
+        }
+        pid = -1;
     }
 }
 
