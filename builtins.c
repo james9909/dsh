@@ -7,7 +7,7 @@
 
 #include "builtins.h"
 
-int handle_builtins(char* argl[])
+int handle_builtins(char **argl)
 {
     if (strcmp(argl[0], "exit") == 0)
     {
@@ -17,7 +17,7 @@ int handle_builtins(char* argl[])
     if (strcmp(argl[0], "cd") == 0)
     {
         char *path;
-        if (sizeof(&argl) / sizeof(char) == 1) {
+        if (sizeof(argl) / sizeof(argl[0]) == 1) {
             path = "~";
         } else {
             path = argl[1];
