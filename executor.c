@@ -86,8 +86,8 @@ void handle_redirect(char *argv[512])
                 }
                 if (outerr)
                 {
-                    dup2(fd, 1);
-                    dup2(fd, 2);
+                    dup2(fd, STDIN_FILENO);
+                    dup2(fd, STDERR_FILENO);
                 } else
                 {
                     dup2(fd, src);
@@ -98,8 +98,8 @@ void handle_redirect(char *argv[512])
                 fd = open(p, O_WRONLY|O_CREAT|append, 0644);
                 if (outerr)
                 {
-                    dup2(fd, 1);
-                    dup2(fd, 2);
+                    dup2(fd, STDOUT_FILENO);
+                    dup2(fd, STDERR_FILENO);
                 } else
                 {
                     dup2(fd, src);
