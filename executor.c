@@ -66,26 +66,28 @@ void combine_quoted(char *argv[512])
                 exit(1);
             }
             p[strlen(p)-1] = 0;
-            printf(":: %s\n", p);
-            printf(":: %d\n", di);
-            int size = 0;
-            int j;
-            for (j = di; j <= i; ++j)
+            if (i != di)
             {
-                size += strlen(argv[j]);
-            }
-            char *tmp = (char*)malloc(size*sizeof(char));
-            strcpy(tmp, argv[di]);
-            if (di != i)
+                printf(":: %s\n", p);
+                printf(":: %d\n", di);
+                int size = 0;
+                int j;
+                for (j = di; j <= i; ++j)
+                {
+                    size += strlen(argv[j]);
+                }
+                char *tmp = (char*)malloc(size*sizeof(char));
+                strcpy(tmp, argv[di]);
                 free(argv[di]);
-            argv[di] = tmp;
-            for (j = di+1; j <= i; ++j)
-            {
-                strcat(argv[di], " ");
-                strcat(argv[di], argv[j]);
-                argv[j] = " ";
+                argv[di] = tmp;
+                for (j = di+1; j <= i; ++j)
+                {
+                    strcat(argv[di], " ");
+                    strcat(argv[di], argv[j]);
+                    argv[j] = " ";
+                }
+                dquote_args[--di] = -1;
             }
-            dquote_args[--di] = -1;
         }
         if (p[strlen(p)-1] == '\'')
         {
@@ -95,24 +97,26 @@ void combine_quoted(char *argv[512])
                 exit(1);
             }
             p[strlen(p)-1] = 0;
-            int size = 0;
-            int j;
-            for (j = si; j <= i; ++j)
+            if (i != si)
             {
-                size += strlen(argv[j]);
-            }
-            char *tmp = (char*)malloc(size*sizeof(char));
-            strcpy(tmp, argv[si]);
-            if (si != i)
+                int size = 0;
+                int j;
+                for (j = si; j <= i; ++j)
+                {
+                    size += strlen(argv[j]);
+                }
+                char *tmp = (char*)malloc(size*sizeof(char));
+                strcpy(tmp, argv[si]);
                 free(argv[si]);
-            argv[si] = tmp;
-            for (j = si+1; j <= i; ++j)
-            {
-                strcat(argv[si], " ");
-                strcat(argv[si], argv[j]);
-                argv[j] = " ";
+                argv[si] = tmp;
+                for (j = si+1; j <= i; ++j)
+                {
+                    strcat(argv[si], " ");
+                    strcat(argv[si], argv[j]);
+                    argv[j] = " ";
+                }
+                squote_args[--si] = -1;
             }
-            squote_args[--si] = -1;
         }
         argv[i] = strdup(argv[i]);
     }
