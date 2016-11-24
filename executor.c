@@ -66,24 +66,23 @@ void combine_quoted(char *argv[512])
                 exit(1);
             }
             p[strlen(p)-1] = 0;
-            if (i != di)
+            int start_quote = dquote_args[di-1];
+            if (i != start_quote)
             {
-                printf(":: %s\n", p);
-                printf(":: %d\n", di);
-                int size = 0;
+                int size = i - start_quote;
                 int j;
-                for (j = di; j <= i; ++j)
+                for (j = start_quote; j <= i; ++j)
                 {
                     size += strlen(argv[j]);
                 }
                 char *tmp = (char*)malloc(size*sizeof(char));
-                strcpy(tmp, argv[di]);
-                free(argv[di]);
-                argv[di] = tmp;
-                for (j = di+1; j <= i; ++j)
+                strcpy(tmp, argv[start_quote]);
+                free(argv[start_quote]);
+                argv[start_quote] = tmp;
+                for (j = start_quote+1; j <= i; ++j)
                 {
-                    strcat(argv[di], " ");
-                    strcat(argv[di], argv[j]);
+                    strcat(argv[start_quote], " ");
+                    strcat(argv[start_quote], argv[j]);
                     argv[j] = " ";
                 }
                 dquote_args[--di] = -1;
@@ -97,22 +96,23 @@ void combine_quoted(char *argv[512])
                 exit(1);
             }
             p[strlen(p)-1] = 0;
-            if (i != si)
+            int start_quote = squote_args[si-1];
+            if (i != start_quote)
             {
-                int size = 0;
+                int size = i - start_quote;
                 int j;
-                for (j = si; j <= i; ++j)
+                for (j = start_quote; j <= i; ++j)
                 {
                     size += strlen(argv[j]);
                 }
                 char *tmp = (char*)malloc(size*sizeof(char));
-                strcpy(tmp, argv[si]);
-                free(argv[si]);
-                argv[si] = tmp;
+                strcpy(tmp, argv[start_quote]);
+                free(argv[start_quote]);
+                argv[start_quote] = tmp;
                 for (j = si+1; j <= i; ++j)
                 {
-                    strcat(argv[si], " ");
-                    strcat(argv[si], argv[j]);
+                    strcat(argv[start_quote], " ");
+                    strcat(argv[start_quote], argv[j]);
                     argv[j] = " ";
                 }
                 squote_args[--si] = -1;
@@ -303,6 +303,7 @@ void handle_pipes(char *cmd, int num_pipes)
             int j;
             for (j = 0; pipe_cmds[i]; ++j)
                 argv[j] = strsep(&pipe_cmds[i], " ");
+            combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
@@ -360,7 +361,6 @@ void run(char *input)
             argv[j] = strsep(&cmds[i], " ");
         }
         argv[j] = 0;
-        combine_quoted(argv);
 
         if (strlen(*argv) == 0)
         {
@@ -373,15 +373,15 @@ void run(char *input)
         pid = fork();
         if (pid == 0)
         {
+            //combine_quoted uses malloc and strdup, but we don't need to free
+            //because exec copies the args and destroys everything :)
+            // :)
+            combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
-        }
-        for (j = 0; argv[j]; ++j)
-        {
-            free(argv[j]);
         }
         int exit_code;
         waitpid(pid, &exit_code, 0);
