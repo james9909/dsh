@@ -160,7 +160,7 @@ void handle_redirect(char *argv[512])
 
         //Redirect stdout
         if (p[0] == '>' ||
-           (strlen(p) > 2 && p[1] == '>'))
+           (strlen(p) > 1 && p[1] == '>'))
         {
             int src = -1;
             append = 0;
@@ -184,13 +184,12 @@ void handle_redirect(char *argv[512])
                 p++;
                 p++;
             }
-            int fd;
             if (p[0] == '>')
             {
                 append = O_APPEND;
                 p++;
             }
-            if (!p[0]) //NOT for '&', only files
+            if (!p[0]) //NOT for >&1 >&2, only files
             {
                 if (outerr)
                 {
@@ -205,6 +204,7 @@ void handle_redirect(char *argv[512])
                 outerr = 0;
                 continue;
             }
+            int fd;
             //Redirect to stdin/stdout/stderr
             if (p[0] == '&')
             {
@@ -243,7 +243,7 @@ void handle_redirect(char *argv[512])
             continue;
         }
         if (p[0] == '<' ||
-           ((strlen(p) > 2 && p[1] == '<')))
+           ((strlen(p) > 1 && p[1] == '<')))
         {
             if (p[0] != '<' && !(p[0] == '0' && p[1] == '<'))
             {
