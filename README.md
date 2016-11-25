@@ -10,9 +10,11 @@ Features:
 * Support for redirection
 * Support for piping together 2 or more commands
 * Customizeable prompt
+* Support for globs
 
 TODO:
-* Add support for globs
+* Add support for aliases
+* Add config file for aliases and prompt
 
 Attempted:
 

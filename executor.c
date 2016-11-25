@@ -289,7 +289,7 @@ void handle_pipes(char *cmd, int num_pipes)
             pipe_cmds[i][j] = 0;
         }
     }
-    char *argv[512] = {};
+    char *argv_buf[512] = {};
     for (i = 0; pipe_cmds[i]; ++i)
     {
         //handle_builtins(&pipe_cmds[i]);
@@ -302,7 +302,9 @@ void handle_pipes(char *cmd, int num_pipes)
                 dup2(pfds[i*2+1], 1);
             int j;
             for (j = 0; pipe_cmds[i]; ++j)
-                argv[j] = strsep(&pipe_cmds[i], " ");
+                argv_buf[j] = strsep(&pipe_cmds[i], " ");
+
+            char **argv = expand(argv_buf);
             combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
@@ -311,9 +313,9 @@ void handle_pipes(char *cmd, int num_pipes)
             exit(127);
         }
         int j;
-        for (j = 0; argv[j]; ++j)
+        for (j = 0; argv_buf[j]; ++j)
         {
-            free(argv[j]);
+            free(argv_buf[j]);
         }
         int exit_code;
         waitpid(pid, &exit_code, 0);
@@ -334,7 +336,7 @@ void handle_pipes(char *cmd, int num_pipes)
 void run(char *input)
 {
     char *cmds[512] = {};
-    char *argv[512] = {};
+    char *argv_buf[512] = {};
     int i,j;
     for (i = 0; cmds[i] = strsep(&input, ";"); ++i)
     {
@@ -358,14 +360,16 @@ void run(char *input)
 
         for (j = 0; cmds[i]; ++j)
         {
-            argv[j] = strsep(&cmds[i], " ");
+            argv_buf[j] = strsep(&cmds[i], " ");
         }
-        argv[j] = 0;
+        argv_buf[j] = 0;
 
-        if (strlen(*argv) == 0)
+        if (strlen(*argv_buf) == 0)
         {
             continue;
         }
+
+        char **argv = expand(argv_buf);
 
         if (handle_builtins(argv))
             continue;

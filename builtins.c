@@ -1,3 +1,4 @@
+#include <glob.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,11 +24,14 @@ int handle_builtins(char **argl)
 
         if (argc == 0) {
             path = "~";
-        } else {
+        } else if (argc == 1) {
             path = argl[1];
+        } else {
+            printf("cd: Too many arguments\n");
+            return 1;
         }
 
-        int status = chdir(expand(path));
+        int status = chdir(path);
         if (status == -1) {
             printf("cd: %s: %s\n", strerror(errno), path);
         }
@@ -36,8 +40,23 @@ int handle_builtins(char **argl)
     return 0;
 }
 
-char *expand(char *path) {
-    wordexp_t expanded;
-    wordexp(path, &expanded, 0);
-    return expanded.we_wordv[0];
+char **expand(char **argl) {
+    glob_t globbuf;
+    int i, j, k;
+    int flags = GLOB_TILDE | GLOB_NOCHECK;
+
+    int size = 128;
+    char **new = (char **) calloc(size, sizeof(char*));
+    int newi = 0;
+
+    for (i = 0; argl[i] != NULL; i++) {
+        glob(argl[i], flags , NULL, &globbuf);
+        for (j = 0; j < globbuf.gl_pathc; ++j) {
+            new[newi++] = globbuf.gl_pathv[j];
+            if (newi > size) {
+                new = realloc(new, size*2);
+            }
+        }
+    }
+    return new;
 }
