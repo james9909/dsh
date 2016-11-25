@@ -17,7 +17,11 @@ int handle_builtins(char **argl)
     if (strcmp(argl[0], "cd") == 0)
     {
         char *path;
-        if (sizeof(argl) / sizeof(argl[0]) == 1) {
+
+        int argc;
+        for (argc = 0; argl[argc + 1]; argc++);
+
+        if (argc == 0) {
             path = "~";
         } else {
             path = argl[1];
