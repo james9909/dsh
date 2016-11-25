@@ -1,0 +1,3 @@
+echo "Testing quotes"
+touch "file 1"
+rm "file 1"

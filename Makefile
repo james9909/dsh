@@ -6,3 +6,10 @@ clean:
 
 run:
 	./dsh
+
+test:
+	for test in tests/*; do \
+		clear; \
+		./dsh < $$test; \
+		sleep 2; \
+	done

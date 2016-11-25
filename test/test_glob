@@ -1,0 +1,3 @@
+echo Testing glob...
+ls *.c
+cat *.h
