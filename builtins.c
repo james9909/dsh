@@ -42,21 +42,26 @@ int handle_builtins(char **argl)
 
 char **expand(char **argl) {
     glob_t globbuf;
-    int i, j, k;
-    int flags = GLOB_TILDE | GLOB_NOCHECK;
+    int i, j;
+    int flags = GLOB_TILDE;// | GLOB_NOCHECK;
 
     int size = 128;
     char **new = (char **) calloc(size, sizeof(char*));
     int newi = 0;
 
     for (i = 0; argl[i] != NULL; i++) {
-        glob(argl[i], flags , NULL, &globbuf);
+        int result = glob(argl[i], flags , NULL, &globbuf);
+        if (result == GLOB_NOMATCH) {
+            new[newi++] = argl[i];
+            continue;
+        }
         for (j = 0; j < globbuf.gl_pathc; ++j) {
-            new[newi++] = globbuf.gl_pathv[j];
+            new[newi++] = strdup(globbuf.gl_pathv[j]);
             if (newi > size) {
                 new = realloc(new, size*2);
             }
         }
     }
+    globfree(&globbuf);
     return new;
 }

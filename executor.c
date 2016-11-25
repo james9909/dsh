@@ -309,7 +309,7 @@ void handle_pipes(char *cmd, int num_pipes)
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
-            printf("dsh: Command not found: %s\n", argv[0]);
+            free(argv);
             exit(127);
         }
         int j;
@@ -385,8 +385,14 @@ void run(char *input)
             remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
+            free(argv);
             exit(127);
         }
+        int j;
+        for (j = 0; argv[j]; ++j) {
+            free(argv[j]);
+        }
+        free(argv);
         int exit_code;
         waitpid(pid, &exit_code, 0);
 

@@ -30,8 +30,11 @@ Contains the loop that prints the prompt, reads, and executes user input.
 Contains the builtin commands `cd` and `exit`.
 ```c
 
-/* Expands a string, converting '~' to the user's home directory. */
-char *expand(char *path);
+/* Expands all strings in an array.
+ *
+ * Returns a dynamically allocated string array.
+ */
+char **expand(char **path);
 
 /*
  * Handles all shell built-in commands that are not meant to be
