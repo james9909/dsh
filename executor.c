@@ -388,10 +388,6 @@ void run(char *input)
             free(argv);
             exit(127);
         }
-        int j;
-        for (j = 0; argv[j]; ++j) {
-            free(argv[j]);
-        }
         free(argv);
         int exit_code;
         waitpid(pid, &exit_code, 0);
