@@ -10,6 +10,15 @@
 #include "executor.h"
 #include "builtins.h"
 
+/*
+ * We allocate memory only in the child process.
+ * The process image is immediately replaced
+ * by execvp. It's both unnecessary and impossible
+ * to free, as we need to provide those arguments
+ * to execvp. If it fails, we immediately exit,
+ * again making freeing useless.
+ */
+
 pid_t pid;
 
 void remove_spaces(char *argv[512])
@@ -309,13 +318,8 @@ void handle_pipes(char *cmd, int num_pipes)
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
-            free(argv);
+            printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
-        }
-        int j;
-        for (j = 0; argv_buf[j]; ++j)
-        {
-            free(argv_buf[j]);
         }
         int exit_code;
         waitpid(pid, &exit_code, 0);
@@ -369,26 +373,20 @@ void run(char *input)
             continue;
         }
 
-        char **argv = expand(argv_buf);
-
-        if (handle_builtins(argv))
+        if (handle_builtins(argv_buf))
             continue;
 
         pid = fork();
         if (pid == 0)
         {
-            //combine_quoted uses malloc and strdup, but we don't need to free
-            //because exec copies the args and destroys everything :)
-            // :)
+            char **argv = expand(argv_buf);
             combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
-            free(argv);
             exit(127);
         }
-        free(argv);
         int exit_code;
         waitpid(pid, &exit_code, 0);
 
