@@ -220,7 +220,7 @@ char **split(char *cmd) {
             }
         } else {
             length = 1;
-            while (cmd[i+length] != '\'' && cmd[i+length] != '"' && cmd[i+length] != ' ') {
+            while (cmd[i+length] && cmd[i+length] != '\'' && cmd[i+length] != '"' && cmd[i+length] != ' ') {
                 length++;
             }
             *ptr = (char *) calloc(length, sizeof(char));
