@@ -23,7 +23,7 @@ int handle_builtins(char **argl)
         for (argc = 0; argl[argc + 1]; argc++);
 
         if (argc == 0) {
-            path = "~";
+            path = getenv("HOME");
         } else if (argc == 1) {
             path = argl[1];
         } else {
@@ -43,18 +43,14 @@ int handle_builtins(char **argl)
 char **expand(char **argl) {
     glob_t globbuf;
     int i, j;
-    int flags = GLOB_TILDE;// | GLOB_NOCHECK;
+    int flags = GLOB_TILDE | GLOB_NOCHECK;
 
     int size = 128;
     char **new = (char **) calloc(size, sizeof(char*));
     int newi = 0;
 
     for (i = 0; argl[i] != NULL; i++) {
-        int result = glob(argl[i], flags , NULL, &globbuf);
-        if (result == GLOB_NOMATCH) {
-            new[newi++] = argl[i];
-            continue;
-        }
+        glob(argl[i], flags , NULL, &globbuf);
         for (j = 0; j < globbuf.gl_pathc; ++j) {
             new[newi++] = strdup(globbuf.gl_pathv[j]);
             if (newi > size) {

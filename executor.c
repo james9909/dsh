@@ -373,13 +373,13 @@ void run(char *input)
             continue;
         }
 
-        if (handle_builtins(argv_buf))
+        char **argv = expand(argv_buf);
+        if (handle_builtins(argv))
             continue;
 
         pid = fork();
         if (pid == 0)
         {
-            char **argv = expand(argv_buf);
             combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
@@ -387,6 +387,11 @@ void run(char *input)
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
         }
+
+        for (j = 0; argv[j]; j++) {
+            free(argv[j]);
+        }
+
         int exit_code;
         waitpid(pid, &exit_code, 0);
 
