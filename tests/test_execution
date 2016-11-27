@@ -1,7 +1,13 @@
 echo Testing execution...
-ls; pwd
+;
+;;
+ ;  ;
+ ls
+ls ; pwd
 ls -al
 cd ~; pwd
+cd; pwd
 echo This will take 2 seconds
 sleep 2; echo Done!
+thiscommanddoesntexist
 exit

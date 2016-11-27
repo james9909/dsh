@@ -4,5 +4,5 @@ ls 2> /dev/null
 ls &> /dev/null
 echo 1 > file
 echo 2 >> file
-cat file
+cat < file
 rm file
