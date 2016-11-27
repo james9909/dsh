@@ -45,93 +45,6 @@ void remove_spaces(char *argv[512])
     }
 }
 
-void combine_quoted(char *argv[512])
-{
-    int dquote = 0;
-    int squote = 0;
-    int dquote_args[512] = {};
-    int squote_args[512] = {};
-    int di = 0;
-    int si = 0;
-
-    int i;
-    for (i = 0; argv[i]; ++i)
-    {
-        char *p = argv[i];
-        if (p[0] == '"')
-        {
-            dquote_args[di++] = i;
-            argv[i]++;
-        }
-        if (p[0] == '\'')
-        {
-            squote_args[si++] = i;
-            argv[i]++;
-        }
-        if (p[strlen(p)-1] == '"')
-        {
-            if (di == 0)
-            {
-                perror("dsh: Ill-formed string");
-                exit(1);
-            }
-            p[strlen(p)-1] = 0;
-            int start_quote = dquote_args[di-1];
-            if (i != start_quote)
-            {
-                int size = i - start_quote;
-                int j;
-                for (j = start_quote; j <= i; ++j)
-                {
-                    size += strlen(argv[j]);
-                }
-                char *tmp = (char*)malloc(size*sizeof(char));
-                strcpy(tmp, argv[start_quote]);
-                free(argv[start_quote]);
-                argv[start_quote] = tmp;
-                for (j = start_quote+1; j <= i; ++j)
-                {
-                    strcat(argv[start_quote], " ");
-                    strcat(argv[start_quote], argv[j]);
-                    argv[j] = " ";
-                }
-                dquote_args[--di] = -1;
-            }
-        }
-        if (p[strlen(p)-1] == '\'')
-        {
-            if (si == 0)
-            {
-                perror("dsh: Ill-formed string");
-                exit(1);
-            }
-            p[strlen(p)-1] = 0;
-            int start_quote = squote_args[si-1];
-            if (i != start_quote)
-            {
-                int size = i - start_quote;
-                int j;
-                for (j = start_quote; j <= i; ++j)
-                {
-                    size += strlen(argv[j]);
-                }
-                char *tmp = (char*)malloc(size*sizeof(char));
-                strcpy(tmp, argv[start_quote]);
-                free(argv[start_quote]);
-                argv[start_quote] = tmp;
-                for (j = si+1; j <= i; ++j)
-                {
-                    strcat(argv[start_quote], " ");
-                    strcat(argv[start_quote], argv[j]);
-                    argv[j] = " ";
-                }
-                squote_args[--si] = -1;
-            }
-        }
-        argv[i] = strdup(argv[i]);
-    }
-}
-
 void handle_redirect(char *argv[512])
 {
     int use_stdin_next = 0;
@@ -279,6 +192,45 @@ void handle_redirect(char *argv[512])
     }
 }
 
+char **split(char *cmd) {
+    char **ret, **ptr;
+    int len = strlen(cmd);
+    int i;
+    ret = ptr = (char **) calloc(len, sizeof(char *));
+    if (!(*cmd)) {
+        *ptr = strdup("");
+    }
+
+    char quoted = 0;
+    int length;
+    for (i = 0; i < len; i++) {
+        if (cmd[i] == '\'' || cmd[i] == '"') {
+            quoted = cmd[i];
+            length = 1;
+            while (cmd[i+length] && cmd[i+length] != quoted) {
+                length++;
+            }
+            *ptr = (char *) calloc(length, sizeof(char));
+            strncpy(*ptr++, cmd+i+1, length-1);
+            i += length;
+            quoted = 0;
+        } else if (cmd[i] == ' ') {
+            if (ptr != NULL) {
+                ptr++;
+            }
+        } else {
+            length = 1;
+            while (cmd[i+length] != '\'' && cmd[i+length] != '"' && cmd[i+length] != ' ') {
+                length++;
+            }
+            *ptr = (char *) calloc(length, sizeof(char));
+            strncpy(*ptr++, cmd+i, length);
+            i += length;
+        }
+    }
+    return ret;
+}
+
 void handle_pipes(char *cmd, int num_pipes)
 {
     char *pipe_cmds[512] = {};
@@ -310,12 +262,10 @@ void handle_pipes(char *cmd, int num_pipes)
                 dup2(pfds[(i-1)*2], 0);
             if (i != num_pipes)
                 dup2(pfds[i*2+1], 1);
-            int j;
-            for (j = 0; pipe_cmds[i]; ++j)
-                argv_buf[j] = strsep(&pipe_cmds[i], " ");
 
-            char **argv = expand(argv_buf);
-            combine_quoted(argv);
+            char **argv = split(pipe_cmds[i]);
+
+            argv = expand(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
@@ -363,25 +313,22 @@ void run(char *input)
             continue;
         }
 
-        for (j = 0; cmds[i]; ++j)
-        {
-            argv_buf[j] = strsep(&cmds[i], " ");
-        }
-        argv_buf[j] = 0;
+        char **argv = split(cmd);
 
-        if (strlen(*argv_buf) == 0)
+        if (strlen(*argv) == 0)
         {
+            free(argv[0]);
+            free(argv);
             continue;
         }
 
-        if (handle_builtins(argv_buf))
+        if (handle_builtins(argv))
             continue;
 
         pid = fork();
         if (pid == 0)
         {
-            char **argv = expand(argv_buf);
-            combine_quoted(argv);
+            argv = expand(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
