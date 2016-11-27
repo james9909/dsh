@@ -8,6 +8,14 @@
 
 #include "builtins.h"
 
+void single_expand(char **arg)
+{
+    glob_t globbuf;
+    glob(*arg, GLOB_TILDE|GLOB_NOCHECK, NULL, &globbuf);
+    *arg = strdup(globbuf.gl_pathv[0]);
+    globfree(&globbuf);
+}
+
 int handle_builtins(char **argl)
 {
     if (strcmp(argl[0], "exit") == 0)
@@ -24,8 +32,10 @@ int handle_builtins(char **argl)
 
         if (argc == 0) {
             path = getenv("HOME");
+            path = strdup(path);
         } else if (argc == 1) {
             path = argl[1];
+            single_expand(&path);
         } else {
             printf("cd: Too many arguments\n");
             return 1;
@@ -35,6 +45,7 @@ int handle_builtins(char **argl)
         if (status == -1) {
             printf("cd: %s: %s\n", strerror(errno), path);
         }
+        free(path);
         return 1;
     }
     return 0;

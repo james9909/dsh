@@ -9,6 +9,7 @@
 #include "prompt.h"
 #include "executor.h"
 #include "builtins.h"
+#include "aliases.h"
 
 /*
  * We allocate memory only in the child process.
@@ -373,23 +374,19 @@ void run(char *input)
             continue;
         }
 
-        char **argv = expand(argv_buf);
-        if (handle_builtins(argv))
+        if (handle_builtins(argv_buf))
             continue;
 
         pid = fork();
         if (pid == 0)
         {
+            char **argv = expand(argv_buf);
             combine_quoted(argv);
             handle_redirect(argv);
             remove_spaces(argv);
             execvp(argv[0], argv);
             printf("dsh: Command not found: %s\n", argv[0]);
             exit(127);
-        }
-
-        for (j = 0; argv[j]; j++) {
-            free(argv[j]);
         }
 
         int exit_code;
