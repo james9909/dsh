@@ -34,7 +34,6 @@ int handle_builtins(char **argl)
             path = "~";
         } else if (argc == 1) {
             path = argl[1];
-            single_expand(&path);
         } else {
             printf("cd: Too many arguments\n");
             return 1;
