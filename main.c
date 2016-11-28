@@ -40,7 +40,11 @@ int main()
         input = readline(prompt);
         free(prompt);
 
-        if (!input) break;
+        if (!input) { // EOF
+            printf("\n");
+            break;
+        }
+
         if (input[0] != 0) add_history(input);
 
         run(input);
