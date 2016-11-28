@@ -31,8 +31,7 @@ int handle_builtins(char **argl)
         for (argc = 0; argl[argc + 1]; argc++);
 
         if (argc == 0) {
-            path = getenv("HOME");
-            path = strdup(path);
+            path = "~";
         } else if (argc == 1) {
             path = argl[1];
             single_expand(&path);
@@ -40,6 +39,7 @@ int handle_builtins(char **argl)
             printf("cd: Too many arguments\n");
             return 1;
         }
+        single_expand(&path);
 
         int status = chdir(path);
         if (status == -1) {
