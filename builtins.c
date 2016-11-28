@@ -47,6 +47,20 @@ int handle_builtins(char **argl)
         free(path);
         return 1;
     }
+    if (strcmp(argl[0], "alias") == 0) {
+        return 1;
+    }
+    if (strchr(argl[0], '=')) {
+        char *env = argl[0];
+        int length = 0;
+        while (env[length] != '=') length++;
+        char *name = (char *) calloc(length, sizeof(char));
+        char *value = (char *) calloc(strlen(env)-length, sizeof(char));
+        strncpy(name, env, length);
+        strcpy(value, env+length+1);
+        setenv(name, value, 1);
+        return 1;
+    }
     return 0;
 }
 
