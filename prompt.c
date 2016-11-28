@@ -9,7 +9,6 @@
 #include "colors.h"
 #include "prompt.h"
 
-struct passwd *p;
 int exit_code;
 
 void set_exit_code(int n) {
@@ -73,7 +72,6 @@ char *git_info() {
 
 char *get_prompt() {
     int i, length;
-    p = getpwuid(getuid());
     char *prompt = (char *) calloc(1024, sizeof(char));
     for (i = 0; i < strlen(PROMPT); i++) {
         if (PROMPT[i] == '{' && (i == 0 || PROMPT[i-1] != '\\')) {
@@ -97,27 +95,23 @@ char *get_prompt() {
 }
 
 char *get_variable(char *var) {
-    time_t raw;
-    time(&raw);
-    struct tm *timeinfo = localtime(&raw);
     char *value = (char *) calloc(256, sizeof(char));
 
     if (strcmp(var, "time") == 0) {
+        time_t raw;
+        time(&raw);
+        struct tm *timeinfo = localtime(&raw);
         sprintf(value, "%02d:%02d",
             timeinfo->tm_hour % 12,
             timeinfo->tm_min
             );
     } else if (strcmp(var, "username") == 0) {
-        if (!p) {
-            strcpy(value, "unknown");
-        } else {
-            strcpy(value, p->pw_name);
-        }
+        strcpy(value, getenv("USER"));
     } else if (strcmp(var, "host") == 0) {
         gethostname(value, 256);
     } else if (strcmp(var, "pwd") == 0) {
         char cwd[256];
-        char *home = p->pw_dir;
+        char *home = getenv("HOME");
         getcwd(cwd, sizeof(cwd));
 
         long len = strlen(home);
