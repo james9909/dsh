@@ -33,8 +33,8 @@ int main()
 
     sigsetjmp(ctrlc, 1);
 
-    /* add_alias("l", "ls"); */
-    /* add_alias("ll", "ls -al"); */
+    add_alias("l", "ls");
+    add_alias("ll", "ls -al");
     while (1) {
         prompt = get_prompt();
         input = readline(prompt);

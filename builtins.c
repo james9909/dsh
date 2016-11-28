@@ -7,6 +7,7 @@
 #include <wordexp.h>
 
 #include "builtins.h"
+#include "aliases.h"
 
 void single_expand(char **arg)
 {
@@ -53,6 +54,28 @@ int handle_builtins(char **argl)
     }
     if (strcmp(argl[0], "alias") == 0)
     {
+        char *alias = argl[1];
+        char *replacement;
+        int index = -1;
+
+        fprintf(stderr, ":e %s\n", alias);
+        if (alias[strlen(alias)-1] == '=')
+        {
+            alias[strlen(alias)-1] = 0;
+            replacement = argl[2];
+        }
+        else
+        {
+            if (strcmp(argl[2], "=") != 0)
+            {
+                fprintf(stderr, "Invalid syntax.");
+                exit(1);
+            }
+            replacement = argl[3];
+        }
+
+        fprintf(stderr, ": %s,%s\n", alias,replacement);
+        add_alias(alias, replacement);
         return 1;
     }
     if (strchr(argl[0], '='))
