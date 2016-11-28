@@ -11,6 +11,7 @@
 #include "builtins.h"
 #include "executor.h"
 #include "prompt.h"
+#include "aliases.h"
 
 sigjmp_buf ctrlc;
 
@@ -32,6 +33,8 @@ int main()
 
     sigsetjmp(ctrlc, 1);
 
+    /* add_alias("l", "ls"); */
+    /* add_alias("ll", "ls -al"); */
     while (1) {
         prompt = get_prompt();
         input = readline(prompt);

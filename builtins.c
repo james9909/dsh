@@ -30,27 +30,33 @@ int handle_builtins(char **argl)
         int argc;
         for (argc = 0; argl[argc + 1]; argc++);
 
-        if (argc == 0) {
+        if (argc == 0)
+        {
             path = "~";
-        } else if (argc == 1) {
+        } else if (argc == 1)
+        {
             path = argl[1];
-        } else {
+        } else
+        {
             printf("cd: Too many arguments\n");
             return 1;
         }
         single_expand(&path);
 
         int status = chdir(path);
-        if (status == -1) {
+        if (status == -1)
+        {
             printf("cd: %s: %s\n", strerror(errno), path);
         }
         free(path);
         return 1;
     }
-    if (strcmp(argl[0], "alias") == 0) {
+    if (strcmp(argl[0], "alias") == 0)
+    {
         return 1;
     }
-    if (strchr(argl[0], '=')) {
+    if (strchr(argl[0], '='))
+    {
         char *env = argl[0];
         int length = 0;
         while (env[length] != '=') length++;
@@ -59,6 +65,8 @@ int handle_builtins(char **argl)
         strncpy(name, env, length);
         strcpy(value, env+length+1);
         setenv(name, value, 1);
+        free(name);
+        free(value);
         return 1;
     }
     return 0;
@@ -73,11 +81,14 @@ char **expand(char **argl) {
     char **new = (char **) calloc(size, sizeof(char*));
     int newi = 0;
 
-    for (i = 0; argl[i] != NULL; i++) {
+    for (i = 0; argl[i] != NULL; i++)
+    {
         glob(argl[i], flags , NULL, &globbuf);
-        for (j = 0; j < globbuf.gl_pathc; ++j) {
+        for (j = 0; j < globbuf.gl_pathc; ++j)
+        {
             new[newi++] = strdup(globbuf.gl_pathv[j]);
-            if (newi > size) {
+            if (newi > size)
+            {
                 new = realloc(new, size*2);
             }
         }

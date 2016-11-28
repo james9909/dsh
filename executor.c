@@ -313,7 +313,9 @@ void run(char *input)
             continue;
         }
 
+        handle_aliases(&cmd);
         char **argv = split(cmd);
+        free(cmd);
 
         if (strlen(*argv) == 0)
         {
