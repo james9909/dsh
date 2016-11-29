@@ -215,7 +215,7 @@ char **split(char *cmd) {
             i += length;
             quoted = 0;
         } else if (cmd[i] == ' ') {
-            if (ptr != NULL) {
+            if (*ptr != NULL) {
                 ptr++;
             }
         } else {
