@@ -10,6 +10,7 @@ clean:
 run:
 	./dsh
 
+.PHONY: test
 test:
 	for test in tests/*; do \
 		clear; \
