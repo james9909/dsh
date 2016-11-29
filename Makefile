@@ -14,6 +14,6 @@ run:
 test:
 	for test in tests/*; do \
 		clear; \
-		./dsh < $$test; \
+		./dsh < $$test || exit 1; \
 		sleep 2; \
 	done
