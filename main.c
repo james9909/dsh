@@ -23,18 +23,30 @@ static void handler(int signo) {
     signal_process(signo);
 }
 
+void load_config() {
+    char buf[256];
+    FILE *f = fopen(".dshrc", "r");
+
+    if (!f) {
+        return;
+    }
+
+    while (fgets(buf, sizeof(buf), f)) {
+        *(strchr(buf, '\n')) = 0;
+        run(buf);
+    }
+}
+
 int main()
 {
     signal(SIGINT, handler);
 
     char *input;
     char *prompt;
-    load_prompt();
+    load_config();
 
     sigsetjmp(ctrlc, 1);
 
-    add_alias("l", "ls");
-    add_alias("ll", "ls -al");
     while (1) {
         prompt = get_prompt();
         input = readline(prompt);

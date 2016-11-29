@@ -125,12 +125,23 @@ int handle_builtins(char **argl)
     if (strchr(argl[0], '='))
     {
         char *env = argl[0];
-        int length = 0;
-        while (env[length] != '=') length++;
-        char *name = (char *) calloc(length, sizeof(char));
-        char *value = (char *) calloc(strlen(env)-length, sizeof(char));
-        strncpy(name, env, length);
-        strcpy(value, env+length+1);
+        int len_name = 0;
+        while (env[len_name] != '=') len_name++;
+        int len_value = strlen(env) - len_name;
+
+        char first, last;
+        first = env[len_name+1];
+        last = env[len_name + len_value - 1];
+        if (first != '\'' && first != '"' && last != first) {
+            fprintf(stderr, "alias: Invalid syntax. Did you forget quotes?\n");
+            exit(1);
+        }
+
+        char *name = (char *) calloc(len_name, sizeof(char));
+        char *value = (char *) calloc(len_value, sizeof(char));
+        strncpy(name, env, len_name);
+        strncpy(value, env+len_name+2, len_value-3);
+
         setenv(name, value, 1);
         free(name);
         free(value);

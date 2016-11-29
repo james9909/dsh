@@ -1,0 +1,8 @@
+PROMPT="{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {GREEN}{git_info} {sign}{RESET} "
+alias l="ls -al"
+alias ll="ls -l"
+alias ls="ls --color"
+alias gst="git status"
+alias gl="git pull"
+alias gd="git diff"
+alias gp="git push"
