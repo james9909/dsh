@@ -220,7 +220,24 @@ char **split(char *cmd) {
             }
         } else {
             length = 1;
-            while (cmd[i+length] && cmd[i+length] != '\'' && cmd[i+length] != '"' && cmd[i+length] != ' ') {
+            //while (cmd[i+length] && cmd[i+length] != '\'' && cmd[i+length] != '"' && cmd[i+length] != ' ') {
+            while (cmd[i+length] && cmd[i+length] != ' ') {
+                if (cmd[i+length] == '\'' || cmd[i+length] == '"')
+                {
+                    quoted = cmd[i+length];
+                    int l2 = 1;
+                    while (cmd[i+length+l2] && cmd[i+length+l2] != quoted)
+                    {
+                        l2++;
+                    }
+                    if (cmd[i+length+l2+1] && cmd[i+length+l2+1] != ' ')
+                    {
+                        fprintf(stderr, "Invalid syntax.\n");
+                        exit(1);
+                    }
+                    length += l2 + 1;
+                    break;
+                }
                 length++;
             }
             *ptr = (char *) calloc(length, sizeof(char));

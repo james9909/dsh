@@ -56,26 +56,70 @@ int handle_builtins(char **argl)
     {
         char *alias = argl[1];
         char *replacement;
+        char *tmp;
         int index = -1;
 
-        fprintf(stderr, ":e %s\n", alias);
-        if (alias[strlen(alias)-1] == '=')
+        int i;
+        if ((tmp = strchr(alias, '=')))
         {
-            alias[strlen(alias)-1] = 0;
-            replacement = argl[2];
-        }
-        else
-        {
-            if (strcmp(argl[2], "=") != 0)
+            index = tmp - alias;
+            alias[index] = 0;
+            tmp++; //expect '\0' (prev '=')
+
+            char quote_used;
+            if (tmp[0] == '"' || tmp[0] == '\'')
             {
-                fprintf(stderr, "Invalid syntax.");
+                quote_used = tmp[0];
+                tmp++;
+                int length = strlen(tmp);
+                if (tmp[length-1] == quote_used)
+                {
+                    tmp[length-1] = 0;
+                }
+                else
+                {
+                    i = 2;
+                    int ln;
+                    while (1)
+                    {
+                        if (!argl[i])
+                        {
+                            fprintf(stderr, "alias: Invalid syntax.\n");
+                            exit(1);
+                        }
+
+                        ln = strlen(argl[i]);
+                        length += 1 + ln;
+                        if (argl[i][ln-1] == quote_used)
+                        {
+                            argl[i][ln-1] = 0;
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                length++;
+                replacement = (char*)calloc(length, sizeof(char));
+                strcpy(replacement, tmp);
+                for (i = 2; argl[i]; ++i)
+                {
+                    strcat(replacement, " ");
+                    strcat(replacement, argl[i]);
+                }
+            }
+            else
+            {
+                fprintf(stderr, "alias: Invalid syntax. Did you forget quotes?\n");
                 exit(1);
             }
-            replacement = argl[3];
+        } else
+        {
+            fprintf(stderr, "alias: Invalid syntax.\n");
+            exit(1);
         }
 
-        fprintf(stderr, ": %s,%s\n", alias,replacement);
         add_alias(alias, replacement);
+        free(replacement);
         return 1;
     }
     if (strchr(argl[0], '='))
