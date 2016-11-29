@@ -12,9 +12,10 @@ Features:
 * Customizeable prompt
 * Support for globs
 * Support for aliases (limitation: no semicolons in definition)
+* Add config file for aliases and prompt
 
 TODO:
-* Add config file for aliases and prompt
+* Conditionals/loops
 
 Attempted:
 
