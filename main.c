@@ -12,6 +12,8 @@
 #include "executor.h"
 #include "prompt.h"
 #include "aliases.h"
+#include "command.h"
+#include "parser.h"
 
 sigjmp_buf ctrlc;
 
@@ -59,6 +61,9 @@ int main()
 
         if (input[0] != 0) add_history(input);
 
+        Command *c = parse(input);
+        printf("argv[0]: %s\n", c->argv[0]);
+        free_cmds(c);
         run(input);
         free(input);
     }

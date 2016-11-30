@@ -1,8 +1,8 @@
 all:
-	gcc main.c builtins.c executor.c prompt.c aliases.c -o dsh -lreadline
+	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c -o dsh -lreadline
 
 debug:
-	gcc main.c builtins.c executor.c prompt.c aliases.c -o dsh -lreadline -g
+	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c -o dsh -lreadline -g
 
 clean:
 	rm -f dsh
