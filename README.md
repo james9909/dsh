@@ -16,6 +16,8 @@ Features:
 * Recursive descent parser
 
 TODO:
+* Rewrite everything to use Command
+* '&' to not wait on child
 * Conditionals/loops
 
 Attempted:
