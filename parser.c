@@ -118,6 +118,14 @@ int parse_word(char **dst)
          || p[0] == '>'
          || p[0] == '<')
             return 0;
+        if (p[0] == '=')
+        {
+            t[0] = '=';
+            t[1] = 0;
+            *dst = strdup(t);
+            p += 1;
+            return 1;
+        }
 
         for (i = 0;;++i)
         {
@@ -127,7 +135,8 @@ int parse_word(char **dst)
              || p[i] == '|'
              || p[i] == '&'
              || p[i] == '>'
-             || p[i] == '<')
+             || p[i] == '<'
+             || p[i] == '=')
                 break;
 
             t[i] = p[i];
