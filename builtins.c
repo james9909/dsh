@@ -5,7 +5,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <wordexp.h>
+#include <assert.h>
 
+#include "command.h"
+#include "executor.h"
 #include "builtins.h"
 #include "aliases.h"
 
@@ -17,6 +20,69 @@ void single_expand(char **arg)
     globfree(&globbuf);
 }
 
+int is_builtin(char *cmd)
+{
+    if (strcmp(cmd, "cd") == 0
+     || strcmp(cmd, "exit") == 0
+     || strcmp(cmd, "alias") == 0)
+        return 1;
+    if (strchr(cmd, '='))
+        return 1;
+    return 0;
+}
+
+void handle_builtins(Command *c)
+{
+    if (strcmp(c->argv[0], "exit") == 0)
+    {
+        int exit_code = 0;
+        if (c->argc > 1)
+        {
+            exit_code = atoi(c->argv[1]);
+        }
+        exit(exit_code);
+    }
+    if (strcmp(c->argv[0], "cd") == 0)
+    {
+        fprintf(stderr, "cd: Not yet implemented\n");
+        exit(1);
+    }
+    if (strcmp(c->argv[0], "alias") == 0)
+    {
+        int i;
+        for (i = 0; i < c->argc; ++i)
+        {
+            printf("argv[%d]: %s\n", i, c->argv[i]);
+        }
+        if (c->argc < 2)
+        {
+            fprintf(stderr, "alias: Syntax error.\n");
+            exit(1);
+        }
+        char *o, *r;
+        o = c->argv[1];
+        r = strchr(o, '=');
+        r[0] = 0;
+        r++;
+        printf("alias \"%s\" to \"%s\"\n", o, r);
+        printf("Not yet implemented\n");
+        return;
+    }
+    if (strchr(c->argv[0], '='))
+    {
+        char *o, *r;
+        o = c->argv[0];
+        r = strchr(o, '=');
+        r[0] = 0;
+        r++;
+        printf("environmental variable \"%s\" to \"%s\"\n", o, r);
+        printf("Not yet implemented\n");
+        return;
+    }
+    assert(0); //if triggered, is_builtin is not right
+}
+
+/*
 int handle_builtins(char **argl)
 {
     if (strcmp(argl[0], "exit") == 0)
@@ -149,6 +215,7 @@ int handle_builtins(char **argl)
     }
     return 0;
 }
+*/
 
 char **expand(char **argl) {
     glob_t globbuf;

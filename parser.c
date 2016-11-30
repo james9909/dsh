@@ -431,6 +431,9 @@ void print_cmds(Command *c)
 
 Command *parse(char *input)
 {
+#ifdef DEBUG
+    printf("Parser input: %s\n", input);
+#endif
     p = input;
     p_end = p + strlen(p);
 
@@ -460,7 +463,7 @@ Command *parse(char *input)
 #endif
 }
 
-/*
+#ifdef PARSER_ALONE
 int main()
 {
     char s[512];
@@ -469,4 +472,4 @@ int main()
     parse(s);
     return 0;
 }
-*/
+#endif

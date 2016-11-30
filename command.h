@@ -1,6 +1,6 @@
 #pragma once
 
-struct Command
+typedef struct _Command
 {
     char *argv[512];
     int argc;
@@ -15,17 +15,21 @@ struct Command
     char stderr_redir_f[512];
     int stderr_append;
 
-    struct Command *pipe_to;
-    struct Command *piped_from;
+    struct _Command *pipe_to;
+    struct _Command *piped_from;
 
-    struct Command *and_to;
-    struct Command *and_from;
+    struct _Command *and_to;
+    struct _Command *and_from;
 
-    struct Command *or_to;
-    struct Command *or_from;
+    struct _Command *or_to;
+    struct _Command *or_from;
 
-    struct Command *next_cmd;
-    struct Command *prev_cmd;
-};
+    struct _Command *next_cmd;
+    struct _Command *prev_cmd;
+} Command;
 
-typedef struct Command Command;
+void handle_redirects(Command *c);
+Command *get_piped(Command *c);
+Command *get_and(Command *c);
+Command *get_or(Command *c);
+Command *get_next(Command *c);

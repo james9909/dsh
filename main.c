@@ -12,19 +12,21 @@
 #include "executor.h"
 #include "prompt.h"
 #include "aliases.h"
-#include "command.h"
 #include "parser.h"
+#include "command.h"
 
 sigjmp_buf ctrlc;
 
 static void handler(int signo) {
     if (signo == SIGINT) {
-        printf("\n");
-        siglongjmp(ctrlc, 1);
+        /* printf("\n"); */
+        /* siglongjmp(ctrlc, 1); */
+        exit(0);
     }
     signal_process(signo);
 }
 
+/*
 void load_config() {
     char buf[256];
     FILE *f = fopen(".dshrc", "r");
@@ -38,6 +40,7 @@ void load_config() {
         run(buf);
     }
 }
+*/
 
 int main()
 {
@@ -45,27 +48,40 @@ int main()
 
     char *input;
     char *prompt;
-    load_config();
+    /* load_config(); */
 
     sigsetjmp(ctrlc, 1);
 
-    while (1) {
-        prompt = get_prompt();
-        input = readline(prompt);
-        free(prompt);
+    char s[512] = {};
 
-        if (!input) { // EOF
-            printf("\n");
-            break;
+    while (1)
+    {
+        /* prompt = get_prompt(); */
+        /* input = readline(prompt); */
+        /* free(prompt); */
+
+        printf("%% ");
+        fgets(s, 512, stdin);
+        s[strcspn(s, "\n")] = 0;
+        if (s[0] == '\0')
+        {
+            continue;
         }
 
-        if (input[0] != 0) add_history(input);
+        /* if (!input) { // EOF */
+        /*     printf("\n"); */
+        /*     break; */
+        /* } */
 
-        Command *c = parse(input);
+        /* if (input[0] != 0) add_history(input); */
+
+        /* Command *c = parse(input); */
+        Command *c = parse(s);
         printf("argv[0]: %s\n", c->argv[0]);
+        run(c);
         free_cmds(c);
-        run(input);
-        free(input);
+        /* run(input); */
+        /* free(input); */
     }
     return 0;
 }

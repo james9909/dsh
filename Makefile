@@ -1,8 +1,15 @@
 all:
-	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c -o dsh -lreadline
+	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c command.c -o dsh -lreadline
 
 debug:
-	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c -o dsh -lreadline -g
+	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c commanc. -o dsh -lreadline -g -DDEBUG
+
+.PHONY: parser
+parser:
+	gcc parser.c -DPARSER_ALONE
+
+parserdbg:
+	gcc parser.c -DPARSER_ALONE -DDEBUG
 
 clean:
 	rm -f dsh
