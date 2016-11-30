@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include "command.h"
 
-//#define DEBUG
-
 int parse_cmdlist();
 
 char *p;
@@ -39,12 +37,12 @@ void ignore_whitespace()
     while (accept(' ') || accept('\t') || accept('\r'));
 }
 
-int expect(char c)
+void expect(char c)
 {
     if (p[0] == c)
     {
         p++;
-        return 1;
+        return;
     }
     fprintf(stderr, "Parse error: Expected %c, got %c\n", c, p[0]);
     exit(1);
@@ -143,7 +141,6 @@ int parse_word(char **dst)
     return 0;
 }
 
-//TODO: COMPLETE THIS
 int parse_redirect(Command *a)
 {
 #ifdef DEBUG
@@ -181,6 +178,20 @@ int parse_redirect(Command *a)
         }
         ignore_whitespace();
 
+        if (accept('&'))
+        {
+            int new_fd = p[0] - '0';
+            if (new_fd < 1 || new_fd > 2)
+            {
+                fprintf(stderr, "Invalid file descriptor.\n");
+                exit(1);
+            }
+            if (fd == STDOUT_FILENO)
+                a->stdout_redir = new_fd;
+            if (fd == STDERR_FILENO)
+                a->stderr_redir = new_fd;
+            return 1;
+        }
         char *f;
         parse_word(&f);
         if (fd == STDOUT_FILENO)
@@ -200,10 +211,33 @@ int parse_redirect(Command *a)
         }
         ignore_whitespace();
 
+        if (accept('&'))
+        {
+            int new_fd = p[0] - '0';
+            if (new_fd < 1 || new_fd > 2)
+            {
+                fprintf(stderr, "Invalid file descriptor.\n");
+                exit(1);
+            }
+            a->stdout_redir = new_fd;
+            return 1;
+        }
         int fd = STDOUT_FILENO;
         char *f;
         parse_word(&f);
         strcpy(a->stdout_redir_f, f);
+        free(f);
+        return 1;
+    }
+    // <
+    if (p[0] == '<')
+    {
+        p++;
+        ignore_whitespace();
+
+        char *f;
+        parse_word(&f);
+        strcpy(a->stdin_redir_f, f);
         free(f);
         return 1;
     }
@@ -255,10 +289,6 @@ int parse_cmd(Command *a)
     {
         return 1;
     }
-    /* if (parse_cmdlist(a)) */
-    /* { */
-    /*     return 1; */
-    /* } */
     return 0;
 }
 
@@ -345,6 +375,17 @@ int parse_cmdlist(Command *a)
     return 0;
 }
 
+void free_cmds(Command *c)
+{
+    if (c == NULL)
+        return;
+    free(c);
+    free_cmds(c->pipe_to);
+    free_cmds(c->and_to);
+    free_cmds(c->or_to);
+    free_cmds(c->next_cmd);
+}
+
 #ifdef DEBUG
 void print_cmd(Command *c)
 {
@@ -355,14 +396,14 @@ void print_cmd(Command *c)
         printf("argv[%d]: %s\n", i, c->argv[i]);
     }
     printf("argc: %d\n", c->argc);
-    printf("stdin_redir: %d\n"
+    printf("stdin_redir_f: %s\n"
            "stdout_redir: %d\n"
            "stderr_redir: %d\n"
            "stdout_redir_f: %s\n"
            "stderr_redir_f: %s\n"
            "stdout_append: %d\n"
            "stderr_append: %d\n",
-           c->stdin_redir, c->stdout_redir, c->stderr_redir,
+           c->stdin_redir_f, c->stdout_redir, c->stderr_redir,
            c->stdout_redir_f, c->stderr_redir_f,
            c->stdout_append, c->stderr_append);
     printf("Pipes to: %p\n", c->pipe_to);
@@ -388,21 +429,23 @@ void print_cmds(Command *c)
 }
 #endif
 
-void parse(char *input)
+Command *parse(char *input)
 {
     p = input;
     p_end = p + strlen(p);
 
     Command *a = (Command*)calloc(1, sizeof(Command));
     a->argc = 0;
-    a->stdin_redir = 0;
     a->stdout_append = 0;
     a->stderr_append = 0;
     a->stdout_redir = 0;
     a->stderr_redir = 0;
+    memset(a->stdin_redir_f, 0, sizeof(a->stdin_redir_f));
     memset(a->stdout_redir_f, 0, sizeof(a->stdout_redir_f));
     memset(a->stderr_redir_f, 0, sizeof(a->stderr_redir_f));
     parse_cmdlist(a);
+
+    return a;
 
 #ifdef DEBUG
     print_cmds(a);

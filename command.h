@@ -5,7 +5,7 @@ struct Command
     char *argv[512];
     int argc;
 
-    int stdin_redir;
+    char stdin_redir_f[512];
 
     int stdout_redir;
     char stdout_redir_f[512];

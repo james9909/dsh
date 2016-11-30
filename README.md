@@ -13,6 +13,7 @@ Features:
 * Support for globs
 * Support for aliases (limitation: no semicolons in definition)
 * Add config file for aliases and prompt
+* Recursive descent parser
 
 TODO:
 * Conditionals/loops
@@ -119,3 +120,72 @@ void run(char *input);
 /* Sends a signal to the currently running process, if it exists */
 void signal_process(int signo);
 ```
+
+`parser.c`
+
+Handles parsing. Uses input to create a tree of commands and their relations.
+
+```c
+
+/*
+ * If the given character is the next element
+ * in the input, discard it and return true.
+ * Otherwise return false.
+ */
+int accept(char c);
+
+/*
+ * accept(char) but for strings
+ * Used for "&&" and "||"
+ */
+int accepts(char *c);
+
+/* Discard until first non-whitespace character */
+void ignore_whitespace();
+
+/*
+ * If the given character is the next element
+ * in the input, discard it and return true.
+ * Otherwise, abort.
+ * Currently unused.
+ */
+void expect(char c);
+
+/*
+ * Read a word up till certain special characters
+ * or until quote ends. Put on heap and make *dst point to it.
+ */
+int parse_word(char **dst);
+
+/* Parse all forms of redirects. */
+int parse_redirect(Command *a);
+
+/* Attempt to parse redirects and commands */
+int parse_expr(Command *a);
+
+/* Call parse_expr until nothing left to parse */
+int parse_exprs(Command *a);
+
+/* Currently useless. Adds another layer */
+int parse_cmd(Command *a);
+
+/* Parse pipes. Update current command to the piped one. */
+int parse_pipe(Command **a);
+
+/* Parse && and ||. Update current command to the new one. */
+int parse_connector(Command *a);
+
+/* Parse ;. Update current command to the new one. */
+int parse_cmdlist(Command *a);
+
+/* Free all Commands linked forwardly */
+void free_cmds(Command *c);
+
+/* DEBUG. Print all fields in a Command */
+void print_cmd(Command *c);
+
+/* DEBUG. Print all fields of all linked Commands */
+void print_cmds(Command *c);
+
+/* Parse input */
+void parse(chat *input);
