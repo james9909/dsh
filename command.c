@@ -39,20 +39,3 @@ void handle_redirects(Command *c)
         close(fd);
     }
 }
-
-Command *get_piped(Command *c)
-{
-    return c->pipe_to;
-}
-Command *get_and(Command *c)
-{
-    return c->and_to;
-}
-Command *get_or(Command *c)
-{
-    return c->or_to;
-}
-Command *get_next(Command *c)
-{
-    return c->next_cmd;
-}
