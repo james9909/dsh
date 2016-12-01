@@ -83,11 +83,11 @@ void expand(Command *c)
         {
             c->argv[argc++] = strdup(globbuf.gl_pathv[j]);
         }
+        globfree(&globbuf);
     }
     c->argc = argc;
 
     free(copy);
-    globfree(&globbuf);
 }
 
 void handle_pipes(Command *c)

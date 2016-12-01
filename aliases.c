@@ -42,16 +42,16 @@ void handle_aliases(Command *c)
     {
         if (strcmp(c->argv[0], aliases[0][i]) == 0)
         {
-            char *cmd = strdup(aliases[1][i]);
-            Command *a = parse(cmd);
-            int i;
-            for (i = 1; i < a->argc; ++i)
+            Command *a = parse(aliases[1][i]);
+            int j;
+            for (j = 1; j < a->argc; ++j)
             {
-                c->argv[i+a->argc-1] = c->argv[i];
+                c->argv[j+a->argc-1] = c->argv[j];
+                c->argc++;
             }
-            for (i = 0; i < a->argc; ++i)
+            for (j = 0; j < a->argc; ++j)
             {
-                c->argv[i] = a->argv[i];
+                c->argv[j] = a->argv[j];
             }
             free_cmds(a);
         }

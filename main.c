@@ -34,9 +34,7 @@ void load_config()
     FILE *f = fopen(".dshrc", "r");
 
     if (!f)
-    {
         return;
-    }
 
     while (fgets(buf, sizeof(buf), f))
     {
