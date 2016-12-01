@@ -33,4 +33,5 @@ typedef struct _Command
 
 void handle_redirects(Command *c);
 void handle_pipes(Command *c);
+void expand(Command *c);
 Command *next_cmd(Command *c);

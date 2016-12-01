@@ -1,4 +1,7 @@
+#include <glob.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -62,6 +65,29 @@ Command *next_cmd(Command *c) {
         return c->next_cmd;
     else
         return NULL;
+}
+
+void expand(Command *c)
+{
+    glob_t globbuf;
+    int i, j;
+    int argc = 0;
+    int flags = GLOB_TILDE | GLOB_NOCHECK;
+    char **copy = (char **) calloc(sizeof(c->argv), sizeof(char *));
+    memcpy(copy, c->argv, sizeof(c->argv));
+
+    for (i = 0; copy[i]; ++i)
+    {
+        glob(copy[i], flags, NULL, &globbuf);
+        for (j = 0; j < globbuf.gl_pathc; ++j)
+        {
+            c->argv[argc++] = strdup(globbuf.gl_pathv[j]);
+        }
+    }
+    c->argc = argc;
+
+    free(copy);
+    globfree(&globbuf);
 }
 
 void handle_pipes(Command *c)

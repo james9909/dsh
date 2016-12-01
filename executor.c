@@ -20,6 +20,7 @@ void exec(Command *c)
     {
         return;
     }
+    expand(c);
 
     if (is_builtin(c))
     {

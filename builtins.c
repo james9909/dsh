@@ -12,7 +12,7 @@
 #include "builtins.h"
 #include "aliases.h"
 
-void single_expand(char **arg)
+void expand_path(char **arg)
 {
     glob_t globbuf;
     glob(*arg, GLOB_TILDE|GLOB_NOCHECK, NULL, &globbuf);
@@ -60,7 +60,7 @@ void handle_builtins(Command *c)
             printf("cd: Too many arguments\n");
             return;
         }
-        single_expand(&path);
+        expand_path(&path);
 
         int status = chdir(path);
         if (status == -1)
@@ -91,29 +91,4 @@ void handle_builtins(Command *c)
         return;
     }
     assert(0); //if triggered, is_builtin is not right
-}
-
-char **expand(char **argl) {
-    glob_t globbuf;
-    int i, j;
-    int flags = GLOB_TILDE | GLOB_NOCHECK;
-
-    int size = 128;
-    char **new = (char **) calloc(size, sizeof(char*));
-    int newi = 0;
-
-    for (i = 0; argl[i] != NULL; i++)
-    {
-        glob(argl[i], flags , NULL, &globbuf);
-        for (j = 0; j < globbuf.gl_pathc; ++j)
-        {
-            new[newi++] = strdup(globbuf.gl_pathv[j]);
-            if (newi > size)
-            {
-                new = realloc(new, size*2);
-            }
-        }
-    }
-    globfree(&globbuf);
-    return new;
 }
