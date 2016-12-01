@@ -15,6 +15,9 @@ typedef struct _Command
     char stderr_redir_f[512];
     int stderr_append;
 
+    int pipe_in;
+    int pipe_out;
+
     struct _Command *pipe_to;
     struct _Command *piped_from;
 
@@ -29,8 +32,5 @@ typedef struct _Command
 } Command;
 
 void handle_redirects(Command *c);
-Command *get_piped(Command *c);
-Command *get_and(Command *c);
-Command *get_or(Command *c);
-Command *get_next(Command *c);
+void handle_pipes(Command *c);
 Command *next_cmd(Command *c);

@@ -31,7 +31,7 @@ void exec(Command *c)
         {
             handle_aliases(c);
             handle_redirects(c);
-            /* handle_pipes(c); */
+            handle_pipes(c);
             execvp(c->argv[0], c->argv);
             fprintf(stderr, "dsh: Command not found: %s\n", c->argv[0]);
             exit(1);
@@ -39,6 +39,17 @@ void exec(Command *c)
 
         int exit_code;
         waitpid(pid, &exit_code, 0);
+
+        if (c->pipe_in)
+        {
+            close(c->pipe_in);
+            c->pipe_in = 0;
+        }
+        if (c->pipe_out)
+        {
+            close(c->pipe_out);
+            c->pipe_out = 0;
+        }
 
         if (WIFEXITED(exit_code))
         {
@@ -56,6 +67,13 @@ void run(Command *c)
     Command *i = c;
     while (i)
     {
+        if (i->pipe_to)
+        {
+            int pfds[2];
+            pipe(pfds);
+            i->pipe_out = pfds[1];
+            i->pipe_to->pipe_in = pfds[0];
+        }
         exec(i);
         i = next_cmd(i);
     }

@@ -62,3 +62,15 @@ Command *next_cmd(Command *c) {
         return NULL;
     }
 }
+
+void handle_pipes(Command *c)
+{
+    if (c->pipe_out)
+    {
+        dup2(c->pipe_out, STDOUT_FILENO);
+    }
+    if (c->pipe_in)
+    {
+        dup2(c->pipe_in, STDIN_FILENO);
+    }
+}

@@ -66,7 +66,6 @@ int main()
         if (input[0] != 0) add_history(input);
 
         Command *c = parse(input);
-        printf("argv[0]: %s\n", c->argv[0]);
         run(c);
         free_cmds(c);
         free(input);
