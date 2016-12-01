@@ -25,6 +25,7 @@ Attempted:
 Bugs:
 
 Files & Function Headers:
+
 `main.c`
 
 Contains the loop that prints the prompt, reads, and executes user input.
@@ -64,7 +65,7 @@ void handle_aliases(Command *c);
 
 `builtins.c`
 
-Contains the builtin commands `cd` and `exit`.
+Contains shell builtins
 ```c
 
 /*
