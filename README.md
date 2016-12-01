@@ -28,25 +28,63 @@ Files & Function Headers:
 `main.c`
 
 Contains the loop that prints the prompt, reads, and executes user input.
+```c
+/* Handles signals. Will send the signal to the currently running child process, if it exists. */
+static void handler(int signo);
+
+/* Executes all commands found in the configuration file */
+void load_config();
+
+/* Retrieves user input and executes it */
+int main();
+```
+
+`aliases.c`
+
+Contains functions related to aliases
+```c
+
+/*
+ * Check if an alias exists
+ *
+ * Returns the index of the alias if it exists, and -1 otherwise
+ */
+int find_alias(char *name);
+
+/*
+ * Adds an alias to the table. Will overwrite any existing aliases with the same name
+ */
+void add_alias(char *alias, char *replacement);
+
+/*
+ * Replaces the first argument of a command with its alias, if it exists.
+ */
+void handle_aliases(Command *c);
+```
 
 `builtins.c`
 
 Contains the builtin commands `cd` and `exit`.
 ```c
 
-/* Expands all strings in an array.
- *
- * Returns a dynamically allocated string array.
+/*
+ * Expands the tilde in a path.
+ * path must be freed manually.
  */
-char **expand(char **path);
+void expand_path(char **path);
+
+/*
+ * Checks if a command is a builtin.
+ *
+ * Returns 1 if c is a builtin, 0 otherwise.
+ */
+int is_builtin(Command *c);
 
 /*
  * Handles all shell built-in commands that are not meant to be
  * executed with exec.
- *
- * Returns 1 if the built-in exists, 0 otherwise.
  */
-int handle_builtins(char *argl[]);
+void handle_builtins(Command *C);
 ```
 
 `prompt.c`
@@ -54,8 +92,11 @@ int handle_builtins(char *argl[]);
 Handles the rendering of the prompt.
 ```c
 
-/* Sets the global variable 'exit_code' to the given parameter  */
+/* Sets the global variable 'exit_code' to n */
 void set_exit_code(int n);
+
+/* Returns the exit code of the last command ran */
+int get_exit_code();
 
 /*
  * Loads the custom prompt and checks its validity.
@@ -64,9 +105,10 @@ void set_exit_code(int n);
 void load_prompt();
 
 /*
- * Gets information for the current git repository.
+ * Gets information about the current git repository.
+ * Must be manually freed.
  *
- * Returns a dynamically allocated string in the format (<branch> <status>)
+ * Returns a string in the format (<branch> <status>)
  */
 char *git_info();
 
@@ -88,36 +130,11 @@ Handles the execution of commands
 
 ```c
 
-/*
- * Trims all single-space strings from a string array
- * Other functions set arguments to single space as a means of removal
- * This function allows that to work.
- */
-void remove_spaces(char *argv[512]);
+/* Executes a single command */
+void exec(Command *c);
 
-/*
- * Looks for args with quotes in them
- * and combines them into a single arg.
- * Also copies everything over to heap
- * (must be manually freed).
- */
-void combine_quoted(char *argv[512]);
-
-/*
- * Check if any redirection needs to be done,
- * and perform them accordingly
- */
-void handle_redirect(char *argv[512]);
-
-/*
- * Runs commands that contain pipes.
- * Mirrors the normal program flow but
- * pipes stdin/stdout properly
- */
-void handle_pipes(char *cmd, int num_pipes);
-
-/* Runs a command */
-void run(char *input);
+/* Goes through c, executing all commands */
+void run(Command *c);
 
 /* Sends a signal to the currently running process, if it exists */
 void signal_process(int signo);

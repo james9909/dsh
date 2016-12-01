@@ -20,7 +20,7 @@ int find_alias(char *name)
     return -1;
 }
 
-void add_alias(char *alias, char* replacement)
+void add_alias(char *alias, char *replacement)
 {
     int index = -1;
     if ((index = find_alias(alias)) == -1)
