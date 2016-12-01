@@ -4,7 +4,7 @@ echo Testing execution...
  ;  ;
  ls
 ls ; pwd
-ls -al
+ls -l
 cd ~; pwd
 cd; pwd
 echo This will take 2 seconds

@@ -1,5 +1,7 @@
 echo "Testing quotes"
 touch "file 1"
+file "file 1"
 rm "file 1"
 echo "a" "b" "c"
 python -c "print 'A'*30"
+python -c "import random; print random.choice([1, 2, 3])"
