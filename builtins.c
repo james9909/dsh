@@ -47,18 +47,24 @@ void handle_builtins(Command *c)
     {
         char *path;
 
-        if (c->argc == 1) {
+        if (c->argc == 1)
+        {
             path = "~";
-        } else if (c->argc == 2) {
+        }
+        else if (c->argc == 2)
+        {
             path = c->argv[1];
-        } else {
+        }
+        else
+        {
             printf("cd: Too many arguments\n");
             return;
         }
         single_expand(&path);
 
         int status = chdir(path);
-        if (status == -1) {
+        if (status == -1)
+        {
             printf("cd: %s: %s\n", strerror(errno), path);
         }
         free(path);

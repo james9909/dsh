@@ -42,25 +42,26 @@ void handle_redirects(Command *c)
 }
 
 Command *next_cmd(Command *c) {
-    if (c->pipe_to) {
+    if (c->pipe_to)
         return c->pipe_to;
-    } else if (c->and_to) {
-        if (get_exit_code() == 0) {
+    else if (c->and_to)
+    {
+        if (get_exit_code() == 0)
             return c->and_to;
-        } else {
+        else
             return next_cmd(c->and_to);
-        }
-    } else if (c->or_to) {
-        if (get_exit_code() == 0) {
-            return next_cmd(c->or_to);
-        } else {
-            return c->or_to;
-        }
-    } else if (c->next_cmd) {
-        return c->next_cmd;
-    } else {
-        return NULL;
     }
+    else if (c->or_to)
+    {
+        if (get_exit_code() == 0)
+            return next_cmd(c->or_to);
+        else
+            return c->or_to;
+    }
+    else if (c->next_cmd)
+        return c->next_cmd;
+    else
+        return NULL;
 }
 
 void handle_pipes(Command *c)

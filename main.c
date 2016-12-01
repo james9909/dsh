@@ -17,8 +17,10 @@
 
 sigjmp_buf ctrlc;
 
-static void handler(int signo) {
-    if (signo == SIGINT) {
+static void handler(int signo)
+{
+    if (signo == SIGINT)
+    {
         printf("\n");
         siglongjmp(ctrlc, 1);
         exit(0);
@@ -26,15 +28,18 @@ static void handler(int signo) {
     signal_process(signo);
 }
 
-void load_config() {
+void load_config()
+{
     char buf[256];
     FILE *f = fopen(".dshrc", "r");
 
-    if (!f) {
+    if (!f)
+    {
         return;
     }
 
-    while (fgets(buf, sizeof(buf), f)) {
+    while (fgets(buf, sizeof(buf), f))
+    {
         *(strchr(buf, '\n')) = 0;
         Command *c = parse(buf);
         run(c);
@@ -59,7 +64,8 @@ int main()
         input = readline(prompt);
         free(prompt);
 
-        if (!input) { // EOF
+        if (!input) // EOF
+        {
             printf("\n");
             break;
         }

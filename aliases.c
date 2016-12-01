@@ -38,15 +38,19 @@ void add_alias(char *alias, char* replacement)
 void handle_aliases(Command *c)
 {
     int i;
-    for (i = 0; i < max; ++i) {
-        if (strcmp(c->argv[0], aliases[0][i]) == 0) {
+    for (i = 0; i < max; ++i)
+    {
+        if (strcmp(c->argv[0], aliases[0][i]) == 0)
+        {
             char *cmd = strdup(aliases[1][i]);
             Command *a = parse(cmd);
             int i;
-            for (i = 1; i < a->argc; ++i) {
+            for (i = 1; i < a->argc; ++i)
+            {
                 c->argv[i+a->argc-1] = c->argv[i];
             }
-            for (i = 0; i < a->argc; ++i) {
+            for (i = 0; i < a->argc; ++i)
+            {
                 c->argv[i] = a->argv[i];
             }
             free_cmds(a);

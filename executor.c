@@ -16,7 +16,8 @@ pid_t pid = -1;
 
 void exec(Command *c)
 {
-    if (c->argv[0] == NULL) {
+    if (c->argv[0] == NULL)
+    {
         return;
     }
 
