@@ -61,6 +61,8 @@ int parse_word(char **dst)
     if (p[0] == 0)
         return 0;
 
+    ignore_whitespace();
+
     if (p[0] == '"' || p[0] == '\'')
     {
         int quotes = 1;
