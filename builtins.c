@@ -75,7 +75,7 @@ void handle_builtins(Command *c)
         if (c->argc < 4)
         {
             fprintf(stderr, "alias: Syntax error.\n");
-            exit(1);
+            return;
         }
         add_alias(c->argv[1], c->argv[3]);
         return;
@@ -85,7 +85,7 @@ void handle_builtins(Command *c)
         if (c->argc < 3)
         {
             fprintf(stderr, "Syntax error.\n");
-            exit(1);
+            return;
         }
         setenv(c->argv[0], c->argv[2], 1);
         return;

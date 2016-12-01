@@ -100,8 +100,7 @@ int parse_word(char **dst)
             if (p[i] == '\0')
             {
                 fprintf(stderr, "Parsing error near %c at pos %d\n", p[i-1], i-1);
-                fprintf(stderr, "Maybe your quotes?\n");
-                exit(1);
+                return 0;
             }
             t[i] = p[i];
         }
@@ -195,7 +194,7 @@ int parse_redirect(Command *a)
             if (new_fd < 1 || new_fd > 2)
             {
                 fprintf(stderr, "Invalid file descriptor.\n");
-                exit(1);
+                return 0;
             }
             if (fd == STDOUT_FILENO)
                 a->stdout_redir = new_fd;
@@ -228,7 +227,7 @@ int parse_redirect(Command *a)
             if (new_fd < 1 || new_fd > 2)
             {
                 fprintf(stderr, "Invalid file descriptor.\n");
-                exit(1);
+                return 0;
             }
             a->stdout_redir = new_fd;
             return 1;
