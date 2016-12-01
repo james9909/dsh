@@ -19,8 +19,8 @@ sigjmp_buf ctrlc;
 
 static void handler(int signo) {
     if (signo == SIGINT) {
-        /* printf("\n"); */
-        /* siglongjmp(ctrlc, 1); */
+        printf("\n");
+        siglongjmp(ctrlc, 1);
         exit(0);
     }
     signal_process(signo);
@@ -56,32 +56,26 @@ int main()
 
     while (1)
     {
-        /* prompt = get_prompt(); */
-        /* input = readline(prompt); */
-        /* free(prompt); */
+        prompt = get_prompt();
+        input = readline(prompt);
+        free(prompt);
 
-        printf("%% ");
-        fgets(s, 512, stdin);
-        s[strcspn(s, "\n")] = 0;
-        if (s[0] == '\0')
-        {
-            continue;
+        if (!input) { // EOF
+            printf("\n");
+            break;
         }
 
-        /* if (!input) { // EOF */
-        /*     printf("\n"); */
-        /*     break; */
-        /* } */
+        if (input[0] == 0) {
+            free(input);
+            continue;
+        }
+        add_history(input);
 
-        /* if (input[0] != 0) add_history(input); */
-
-        /* Command *c = parse(input); */
-        Command *c = parse(s);
+        Command *c = parse(input);
         printf("argv[0]: %s\n", c->argv[0]);
         run(c);
         free_cmds(c);
-        /* run(input); */
-        /* free(input); */
+        free(input);
     }
     return 0;
 }
