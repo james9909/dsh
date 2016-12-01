@@ -1,0 +1,4 @@
+echo Testing conditionals...
+echo "This should run" || echo "This should not"
+invalidcommand && exit 1
+echo "This should run" && echo "This too."
