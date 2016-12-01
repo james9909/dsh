@@ -40,6 +40,7 @@ void load_config() {
         run(c);
         free_cmds(c);
     }
+    fclose(f);
 }
 
 int main()

@@ -2,7 +2,7 @@ all:
 	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c command.c -o dsh -lreadline
 
 debug:
-	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c commanc. -o dsh -lreadline -g -DDEBUG
+	gcc main.c builtins.c executor.c prompt.c aliases.c parser.c command.c -o dsh -lreadline -g -DDEBUG
 
 .PHONY: parser
 parser:

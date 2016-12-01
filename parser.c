@@ -390,11 +390,11 @@ void free_cmds(Command *c)
 {
     if (c == NULL)
         return;
-    free(c);
     free_cmds(c->pipe_to);
     free_cmds(c->and_to);
     free_cmds(c->or_to);
     free_cmds(c->next_cmd);
+    free(c);
 }
 
 #ifdef DEBUG
