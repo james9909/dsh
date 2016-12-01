@@ -15,6 +15,10 @@ void set_exit_code(int n) {
     exit_code = n;
 }
 
+int get_exit_code() {
+    return exit_code;
+}
+
 void load_prompt() {
     PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {GREEN}{git_info} {sign}{RESET} "; // TODO: read from file?
     PROMPT = getenv("PROMPT");

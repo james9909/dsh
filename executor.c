@@ -7,7 +7,6 @@
 #include <fcntl.h>
 
 #include "command.h"
-#include "prompt.h"
 #include "executor.h"
 #include "builtins.h"
 #include "aliases.h"
@@ -57,33 +56,7 @@ void run(Command *c)
     while (i)
     {
         exec(i);
-        int n = 0;
-        if (i->pipe_to)
-        {
-            i = i->pipe_to;
-            n++;
-        }
-        if (i->and_to)
-        {
-            i = i->and_to;
-            n++;
-        }
-        if (i->or_to)
-        {
-            i = i->or_to;
-            n++;
-        }
-        if (i->next_cmd)
-        {
-            i = i->next_cmd;
-            n++;
-        }
-        if (n == 0)
-            i = 0;
-        if (n > 1)
-        {
-            fprintf(stderr, "n > 1\nURGENT\n");
-        }
+        i = next_cmd(i);
     }
 }
 

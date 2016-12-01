@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "command.h"
+#include "prompt.h"
 
 void handle_redirects(Command *c)
 {
@@ -37,5 +38,27 @@ void handle_redirects(Command *c)
         int fd = open(c->stderr_redir_f, O_WRONLY|O_CREAT|append, 0644);
         dup2(fd, STDERR_FILENO);
         close(fd);
+    }
+}
+
+Command *next_cmd(Command *c) {
+    if (c->pipe_to) {
+        return c->pipe_to;
+    } else if (c->and_to) {
+        if (get_exit_code() == 0) {
+            return c->and_to;
+        } else {
+            return next_cmd(c->and_to);
+        }
+    } else if (c->or_to) {
+        if (get_exit_code() == 0) {
+            return next_cmd(c->or_to);
+        } else {
+            return c->or_to;
+        }
+    } else if (c->next_cmd) {
+        return c->next_cmd;
+    } else {
+        return NULL;
     }
 }

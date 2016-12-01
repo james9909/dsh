@@ -33,3 +33,4 @@ Command *get_piped(Command *c);
 Command *get_and(Command *c);
 Command *get_or(Command *c);
 Command *get_next(Command *c);
+Command *next_cmd(Command *c);
