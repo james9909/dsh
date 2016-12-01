@@ -457,6 +457,8 @@ Command *parse(char *input)
     memset(a->stdin_redir_f, 0, sizeof(a->stdin_redir_f));
     memset(a->stdout_redir_f, 0, sizeof(a->stdout_redir_f));
     memset(a->stderr_redir_f, 0, sizeof(a->stderr_redir_f));
+    a->pipe_in = 0;
+    a->pipe_out = 0;
     a->pipe_to = 0;
     a->piped_from = 0;
     a->and_to = 0;
