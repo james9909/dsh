@@ -45,8 +45,24 @@ void handle_builtins(Command *c)
     }
     if (strcmp(c->argv[0], "cd") == 0)
     {
-        fprintf(stderr, "cd: Not yet implemented\n");
-        exit(1);
+        char *path;
+
+        if (c->argc == 1) {
+            path = "~";
+        } else if (c->argc == 2) {
+            path = c->argv[1];
+        } else {
+            printf("cd: Too many arguments\n");
+            return;
+        }
+        single_expand(&path);
+
+        int status = chdir(path);
+        if (status == -1) {
+            printf("cd: %s: %s\n", strerror(errno), path);
+        }
+        free(path);
+        return;
     }
     if (strcmp(c->argv[0], "alias") == 0)
     {
@@ -55,8 +71,7 @@ void handle_builtins(Command *c)
             fprintf(stderr, "alias: Syntax error.\n");
             exit(1);
         }
-        printf("alias \"%s\" to \"%s\"\n", c->argv[1], c->argv[3]);
-        printf("Not yet implemented\n");
+        add_alias(c->argv[1], c->argv[3]);
         return;
     }
     if (c->argc > 1 && strcmp(c->argv[1], "=") == 0)
@@ -66,8 +81,7 @@ void handle_builtins(Command *c)
             fprintf(stderr, "Syntax error.\n");
             exit(1);
         }
-        printf("environmental variable \"%s\" to \"%s\"\n", c->argv[0], c->argv[2]);
-        printf("Not yet implemented\n");
+        setenv(c->argv[0], c->argv[2], 1);
         return;
     }
     assert(0); //if triggered, is_builtin is not right

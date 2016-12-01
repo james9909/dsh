@@ -26,7 +26,6 @@ static void handler(int signo) {
     signal_process(signo);
 }
 
-/*
 void load_config() {
     char buf[256];
     FILE *f = fopen(".dshrc", "r");
@@ -37,10 +36,11 @@ void load_config() {
 
     while (fgets(buf, sizeof(buf), f)) {
         *(strchr(buf, '\n')) = 0;
-        run(buf);
+        Command *c = parse(buf);
+        run(c);
+        free_cmds(c);
     }
 }
-*/
 
 int main()
 {
@@ -48,11 +48,9 @@ int main()
 
     char *input;
     char *prompt;
-    /* load_config(); */
+    load_config();
 
     sigsetjmp(ctrlc, 1);
-
-    char s[512] = {};
 
     while (1)
     {

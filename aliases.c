@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "aliases.h"
 #include "executor.h"
 
 char aliases[2][512][512] = {};
@@ -48,38 +50,13 @@ void handle_aliases(char *argv[512])
 }
 */
 
-void handle_aliases(char **cmd)
+void handle_aliases(Command *c)
 {
-    //only replace first word
-
-    char *old = strdup(*cmd);
-    char *t = *cmd;
-    char *c = strsep(&t, " ");
     int i;
-    for (i = 0; i < max; ++i)
-    {
-        if (strcmp(c, aliases[0][i]) == 0)
-        {
-            int size;
-            char *r;
-            if (t)
-            {
-                size = strlen(aliases[1][i]);
-                size += 2 + strlen(t);
-                r = (char*)calloc(size, sizeof(char));
-                strcpy(r, aliases[1][i]);
-                strcat(r, " ");
-                strcat(r, t);
-            } else
-            {
-                size = strlen(aliases[1][i]) + 1;
-                r = (char*)calloc(size, sizeof(char));
-                strcpy(r, aliases[1][i]);
-            }
-            *cmd = r;
-            free(old);
-            return;
+    for (i = 0; i < max; ++i) {
+        if (strcmp(c->argv[0], aliases[0][i]) == 0) {
+            /* c->argv[0] = aliases[1][i]; */
+            printf("Alias triggered for '%s'. Set to '%s'.\n", c->argv[0], aliases[1][i]);
         }
     }
-    *cmd = old;
 }

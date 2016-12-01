@@ -29,7 +29,7 @@ void exec(Command *c)
         pid = fork();
         if (pid == 0) //child
         {
-            /* handle_aliases(c); */
+            handle_aliases(c);
             handle_redirects(c);
             /* handle_pipes(c); */
             execvp(c->argv[0], c->argv);
