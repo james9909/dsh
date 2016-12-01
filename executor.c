@@ -16,6 +16,10 @@ pid_t pid = -1;
 
 void exec(Command *c)
 {
+    if (c->argv[0] == NULL) {
+        return;
+    }
+
     if (is_builtin(c))
     {
         handle_builtins(c);

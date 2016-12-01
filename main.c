@@ -65,11 +65,7 @@ int main()
             break;
         }
 
-        if (input[0] == 0) {
-            free(input);
-            continue;
-        }
-        add_history(input);
+        if (input[0] != 0) add_history(input);
 
         Command *c = parse(input);
         printf("argv[0]: %s\n", c->argv[0]);
