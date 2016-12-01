@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 #include "command.h"
+#include "prompt.h"
 #include "executor.h"
 #include "builtins.h"
 #include "aliases.h"
