@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "parser.h"
 #include "aliases.h"
 #include "executor.h"
 
@@ -55,8 +56,16 @@ void handle_aliases(Command *c)
     int i;
     for (i = 0; i < max; ++i) {
         if (strcmp(c->argv[0], aliases[0][i]) == 0) {
-            /* c->argv[0] = aliases[1][i]; */
-            printf("Alias triggered for '%s'. Set to '%s'.\n", c->argv[0], aliases[1][i]);
+            char *cmd = strdup(aliases[1][i]);
+            Command *a = parse(cmd);
+            int i;
+            for (i = 1; i < a->argc; ++i) {
+                c->argv[i+a->argc-1] = c->argv[i];
+            }
+            for (i = 0; i < a->argc; ++i) {
+                c->argv[i] = a->argv[i];
+            }
+            free_cmds(a);
         }
     }
 }
