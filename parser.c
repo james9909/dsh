@@ -311,9 +311,8 @@ int parse_pipe(Command **a)
     if (parse_cmd(*a))
     {
         ignore_whitespace();
-        if (*p == 0) {
+        if (*p == 0)
             return 0;
-        }
 
         while (p[1] != '|' && accept('|'))
         {

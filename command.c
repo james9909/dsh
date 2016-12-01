@@ -44,7 +44,8 @@ void handle_redirects(Command *c)
     }
 }
 
-Command *next_cmd(Command *c) {
+Command *next_cmd(Command *c)
+{
     if (c->pipe_to)
         return c->pipe_to;
     else if (c->and_to)
