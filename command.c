@@ -20,6 +20,7 @@ void clear_cmd(Command *c)
     memset(c->stdin_redir_f, 0, sizeof(c->stdin_redir_f));
     memset(c->stdout_redir_f, 0, sizeof(c->stdout_redir_f));
     memset(c->stderr_redir_f, 0, sizeof(c->stderr_redir_f));
+    c->dont_wait = 0;
     c->pipe_in = 0;
     c->pipe_out = 0;
     c->pipe_to = 0;

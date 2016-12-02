@@ -343,6 +343,12 @@ int parse_connector(Command *a)
     if (parse_pipe(&a))
     {
         ignore_whitespace();
+        if (p[0] == '&' && p[1] != '&')
+        {
+            p++;
+            ignore_whitespace();
+            a->dont_wait = 1;
+        }
         while (accepts("&&"))
         {
             ignore_whitespace();

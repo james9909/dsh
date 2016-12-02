@@ -39,8 +39,16 @@ void exec(Command *c)
             exit(1);
         }
 
-        int exit_code;
-        waitpid(pid, &exit_code, 0);
+        if (!c->dont_wait)
+        {
+            int exit_code;
+            waitpid(pid, &exit_code, 0);
+            if (WIFEXITED(exit_code))
+            {
+                set_exit_code(WEXITSTATUS(exit_code));
+            }
+        }
+        pid = -1;
 
         if (c->pipe_in)
         {
@@ -53,11 +61,6 @@ void exec(Command *c)
             c->pipe_out = 0;
         }
 
-        if (WIFEXITED(exit_code))
-        {
-            set_exit_code(WEXITSTATUS(exit_code));
-        }
-        pid = -1;
     }
 }
 

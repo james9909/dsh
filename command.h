@@ -15,6 +15,8 @@ typedef struct _Command
     char stderr_redir_f[512];
     int stderr_append;
 
+    int dont_wait;
+
     int pipe_in;
     int pipe_out;
 
