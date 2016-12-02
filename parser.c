@@ -156,7 +156,7 @@ int parse_redirect(Command *a)
     fprintf(stderr, "In parse_redirect()\n");
 #endif
     // &>
-    if (p[0] == '&' && p[1] == '>')
+    if (p[0] == '&' && (p >= p_end || p[1] == '>'))
     {
         p += 2;
         if (accept('>'))
@@ -166,6 +166,12 @@ int parse_redirect(Command *a)
         }
         ignore_whitespace();
 
+        if (p >= p_end)
+        {
+            fprintf(stderr, "dsh: No redirect target.\n");
+            a->abort = 1;
+            return 1;
+        }
         char *f;
         parse_word(&f);
         strcpy(a->stdout_redir_f, f);
@@ -198,13 +204,19 @@ int parse_redirect(Command *a)
             }
             if (fd == new_fd)
             {
-                fprintf(stderr, "dsh: Redirecting to same fd detected.\n");
+                fprintf(stderr, "dsh: Redirecting to same fd.\n");
                 return 1;
             }
             if (fd == STDOUT_FILENO)
                 a->stdout_redir = new_fd;
             if (fd == STDERR_FILENO)
                 a->stderr_redir = new_fd;
+            return 1;
+        }
+        if (p >= p_end)
+        {
+            fprintf(stderr, "dsh: No redirect target.\n");
+            a->abort = 1;
             return 1;
         }
         char *f;
@@ -321,7 +333,7 @@ int parse_pipe(Command **a)
         if (*p == 0)
             return 0;
 
-        while (p[1] != '|' && accept('|'))
+        while (p < p_end && p[1] != '|' && accept('|'))
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));

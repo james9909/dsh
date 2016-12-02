@@ -31,6 +31,7 @@ void clear_cmd(Command *c)
     c->or_from = 0;
     c->next_cmd = 0;
     c->prev_cmd = 0;
+    c->abort = 0;
 }
 
 void handle_redirects(Command *c)

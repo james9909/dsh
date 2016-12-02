@@ -14,15 +14,20 @@
 
 pid_t pid = -1;
 
-void exec(Command *c)
+int exec(Command *c)
 {
     if (c->argv[0] == NULL)
     {
-        return;
+        return 0;
     }
     expand(c);
 
     handle_aliases(c);
+    if (c->abort)
+    {
+        fprintf(stderr, "dsh: Aborting...\n");
+        return 0;
+    }
     if (is_builtin(c))
     {
         handle_builtins(c);
@@ -62,6 +67,7 @@ void exec(Command *c)
         }
 
     }
+    return 1;
 }
 
 void run(Command *c)
@@ -69,8 +75,9 @@ void run(Command *c)
     if (c == NULL)
         return;
 
+    int valid = 1;
     Command *i = c;
-    while (i)
+    while (i && valid)
     {
         if (i->pipe_to)
         {
@@ -79,7 +86,7 @@ void run(Command *c)
             i->pipe_out = pfds[1];
             i->pipe_to->pipe_in = pfds[0];
         }
-        exec(i);
+        valid = exec(i);
         i = next_cmd(i);
     }
 }

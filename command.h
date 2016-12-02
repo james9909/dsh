@@ -31,6 +31,8 @@ typedef struct _Command
 
     struct _Command *next_cmd;
     struct _Command *prev_cmd;
+
+    int abort;
 } Command;
 
 void clear_cmd(Command *c);

@@ -1,7 +1,6 @@
 LIBS = -lreadline
 
 FILES= \
-	main.c \
 	builtins.c \
 	executor.c \
 	prompt.c \
@@ -10,17 +9,17 @@ FILES= \
 	command.c
 
 all:
-	gcc $(FILES) $(LIBS) -o dsh
+	gcc main.c $(FILES) $(LIBS) -o dsh
 
 debug:
-	gcc $(FILES) $(LIBS) -g -o dsh
+	gcc main.c $(FILES) $(LIBS) -g -o dsh
 
 .PHONY: parser
 parser:
-	gcc parser.c -DPARSER_ALONE
+	gcc $(FILES) $(LIBS) -DPARSER_ALONE
 
 parserdbg:
-	gcc parser.c -DPARSER_ALONE -DDEBUG
+	gcc $(FILES) $(LIBS) -DPARSER_ALONE -DDEBUG
 
 clean:
 	rm -f dsh a.out
