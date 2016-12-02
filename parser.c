@@ -205,7 +205,6 @@ int parse_redirect(Command *a)
                 a->stdout_redir = new_fd;
             if (fd == STDERR_FILENO)
                 a->stderr_redir = new_fd;
-            printf("new fd: %d\n", new_fd);
             return 1;
         }
         char *f;
@@ -241,7 +240,6 @@ int parse_redirect(Command *a)
                 return 1;
             }
             a->stdout_redir = new_fd;
-            printf("set fd: %d\n", new_fd);
             return 1;
         }
         int fd = STDOUT_FILENO;

@@ -38,7 +38,7 @@ void handle_redirects(Command *c)
     {
         int fd = open(c->stdin_redir_f, O_RDONLY);
         dup2(fd, STDIN_FILENO);
-        //close(fd);
+        close(fd);
     }
     if (c->stdout_redir)
     {
@@ -50,7 +50,7 @@ void handle_redirects(Command *c)
         int append = c->stdout_append ? O_APPEND : 0;
         int fd = open(c->stdout_redir_f, O_WRONLY|O_CREAT|append, 0644);
         dup2(fd, STDOUT_FILENO);
-        //close(fd);
+        close(fd);
     }
     if (c->stderr_redir)
     {
@@ -62,7 +62,7 @@ void handle_redirects(Command *c)
         int append = c->stderr_append ? O_APPEND : 0;
         int fd = open(c->stderr_redir_f, O_WRONLY|O_CREAT|append, 0644);
         dup2(fd, STDERR_FILENO);
-        //close(fd);
+        close(fd);
     }
 }
 
