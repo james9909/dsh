@@ -43,7 +43,7 @@ void expect(char c)
         p++;
         return;
     }
-    fprintf(stderr, "Parse error: Expected %c, got %c\n", c, p[0]);
+    fprintf(stderr, "dsh: Parse error: Expected %c, got %c\n", c, p[0]);
     exit(1);
 }
 
@@ -98,7 +98,7 @@ int parse_word(char **dst)
                 break;
             if (p[i] == '\0')
             {
-                fprintf(stderr, "Parsing error near %c at pos %d\n", p[i-1], i-1);
+                fprintf(stderr, "dsh: Parsing error near %c at pos %d\n", p[i-1], i);
                 return 0;
             }
             t[i] = p[i];
@@ -190,15 +190,22 @@ int parse_redirect(Command *a)
         if (accept('&'))
         {
             int new_fd = p[0] - '0';
+            p++;
             if (new_fd < 1 || new_fd > 2)
             {
-                fprintf(stderr, "Invalid file descriptor.\n");
-                return 0;
+                fprintf(stderr, "dsh: Invalid file descriptor.\n");
+                return 1;
+            }
+            if (fd == new_fd)
+            {
+                fprintf(stderr, "dsh: Redirecting to same fd detected.\n");
+                return 1;
             }
             if (fd == STDOUT_FILENO)
                 a->stdout_redir = new_fd;
             if (fd == STDERR_FILENO)
                 a->stderr_redir = new_fd;
+            printf("new fd: %d\n", new_fd);
             return 1;
         }
         char *f;
@@ -211,9 +218,8 @@ int parse_redirect(Command *a)
         return 1;
     }
     // >
-    if (p[0] == '>')
+    if (accept('>'))
     {
-        p++;
         if (accept('>'))
         {
             a->stdout_append = 1;
@@ -223,12 +229,19 @@ int parse_redirect(Command *a)
         if (accept('&'))
         {
             int new_fd = p[0] - '0';
+            p++;
             if (new_fd < 1 || new_fd > 2)
             {
-                fprintf(stderr, "Invalid file descriptor.\n");
-                return 0;
+                fprintf(stderr, "dsh: Invalid file descriptor.\n");
+                return 1;
+            }
+            if (new_fd == STDOUT_FILENO)
+            {
+                fprintf(stderr, "dsh: Redirecting to same fd detected.\n");
+                return 1;
             }
             a->stdout_redir = new_fd;
+            printf("set fd: %d\n", new_fd);
             return 1;
         }
         int fd = STDOUT_FILENO;
@@ -239,9 +252,8 @@ int parse_redirect(Command *a)
         return 1;
     }
     // <
-    if (p[0] == '<')
+    if (accept('<'))
     {
-        p++;
         ignore_whitespace();
 
         char *f;

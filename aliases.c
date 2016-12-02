@@ -54,7 +54,6 @@ void handle_aliases(Command *c)
                 c->argv[i] = strdup(a->argv[i]);
             }
             c->argc += a->argc - 1;
-            printf("argc: %d\n", c->argc);
             if (a->pipe_to)
             {
                 c->pipe_to = a->pipe_to;
