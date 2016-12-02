@@ -21,7 +21,6 @@ int accept(char c)
 
 int accepts(char *c)
 {
-    int ret = 1;
     int i;
     for (i = 0; i < strlen(c); ++i)
     {
@@ -260,7 +259,6 @@ int parse_expr(Command *a)
 #ifdef DEBUG
     fprintf(stderr, "In parse_expr()\n");
 #endif
-    char *s;
     if (parse_redirect(a))
     {
         return 1;
