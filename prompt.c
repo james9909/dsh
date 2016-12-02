@@ -161,13 +161,14 @@ char *get_variable(char *var)
     }
     else if (strcmp(var, "sign") == 0)
     {
+        char *sign = geteuid() == 0 ? "#" : "$";
         if (exit_code == 0)
         {
-            strcpy(value, GREEN "$" RESET);
+            sprintf(value, "%s%s%s", GREEN, sign, RESET);
         }
         else
         {
-            strcpy(value, RED "$" RESET);
+            sprintf(value, "%s%s%s", RED, sign, RESET);
         }
     }
     else if (strcmp(var, "git_info") == 0)
