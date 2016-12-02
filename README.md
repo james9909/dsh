@@ -4,21 +4,19 @@ The dead-inside shell - Nobel Gautam and James Wang
 
 Features:
 * Parsing of multiple commands in one line
-* Bash-like keyboard shortcuts
-* Tab completion
-* Quoted args
+* Interactive input using GNU Readline
+* Support for quoted arguments
 * Support for redirection
 * Support for piping together 2 or more commands
 * Customizeable prompt
 * Support for globs
 * Support for aliases
-* Add config file for aliases and prompt
+* Support for setting environment variables
+* Configuration file for aliases and prompt
+* Support for running commands in the background with '&'
 * Recursive descent parser
 
 TODO:
-* Rewrite everything to use Command
-* '&' to not wait on child
-* Conditionals/loops
 
 Attempted:
 
