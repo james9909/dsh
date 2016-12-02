@@ -317,11 +317,9 @@ int parse_pipe(Command **a)
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));
-            if (parse_cmd(b))
-            {
-                (*a)->pipe_to = b;
-                b->piped_from = *a;
-            }
+            parse_cmd(b);
+            (*a)->pipe_to = b;
+            b->piped_from = *a;
             *a = b;
         }
         return 1;
@@ -341,22 +339,18 @@ int parse_connector(Command *a)
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));
-            if (parse_connector(b))
-            {
-                a->and_to = b;
-                b->and_from = a;
-            }
+            parse_connector(b);
+            a->and_to = b;
+            b->and_from = a;
             a = b;
         }
         while (accepts("||"))
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));
-            if (parse_connector(b))
-            {
-                a->or_to = b;
-                b->or_from = a;
-            }
+            parse_connector(b);
+            a->or_to = b;
+            b->or_from = a;
             a = b;
         }
         return 1;
@@ -376,71 +370,15 @@ int parse_cmdlist(Command *a)
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));
-            if (parse_connector(b))
-            {
-                a->next_cmd = b;
-                b->prev_cmd = a;
-            }
+            parse_connector(b);
+            a->next_cmd = b;
+            b->prev_cmd = a;
             a = b;
         }
         return 1;
     }
     return 0;
 }
-
-void free_cmds(Command *c)
-{
-    if (c == NULL)
-        return;
-    free_cmds(c->pipe_to);
-    free_cmds(c->and_to);
-    free_cmds(c->or_to);
-    free_cmds(c->next_cmd);
-    free(c);
-}
-
-#ifdef DEBUG
-void print_cmd(Command *c)
-{
-    printf("Command at %p\n", c);
-    int i;
-    for (i = 0; i < c->argc; ++i)
-    {
-        printf("argv[%d]: %s\n", i, c->argv[i]);
-    }
-    printf("argc: %d\n", c->argc);
-    printf("stdin_redir_f: %s\n"
-           "stdout_redir: %d\n"
-           "stderr_redir: %d\n"
-           "stdout_redir_f: %s\n"
-           "stderr_redir_f: %s\n"
-           "stdout_append: %d\n"
-           "stderr_append: %d\n",
-           c->stdin_redir_f, c->stdout_redir, c->stderr_redir,
-           c->stdout_redir_f, c->stderr_redir_f,
-           c->stdout_append, c->stderr_append);
-    printf("Pipes to: %p\n", c->pipe_to);
-    printf("Piped from: %p\n", c->piped_from);
-    printf("And to: %p\n", c->and_to);
-    printf("And from: %p\n", c->and_from);
-    printf("Or to: %p\n", c->or_to);
-    printf("Or from: %p\n", c->or_from);
-    printf("Next cmd: %p\n", c->next_cmd);
-    printf("Prev cmd: %p\n", c->prev_cmd);
-    printf("-----------------------------\n");
-}
-
-void print_cmds(Command *c)
-{
-    if (c == NULL)
-        return;
-    print_cmd(c);
-    print_cmds(c->pipe_to);
-    print_cmds(c->and_to);
-    print_cmds(c->or_to);
-    print_cmds(c->next_cmd);
-}
-#endif
 
 Command *parse(char *input)
 {
@@ -451,24 +389,7 @@ Command *parse(char *input)
     p_end = p + strlen(p);
 
     Command *a = (Command*)calloc(1, sizeof(Command));
-    a->argc = 0;
-    a->stdout_append = 0;
-    a->stderr_append = 0;
-    a->stdout_redir = 0;
-    a->stderr_redir = 0;
-    memset(a->stdin_redir_f, 0, sizeof(a->stdin_redir_f));
-    memset(a->stdout_redir_f, 0, sizeof(a->stdout_redir_f));
-    memset(a->stderr_redir_f, 0, sizeof(a->stderr_redir_f));
-    a->pipe_in = 0;
-    a->pipe_out = 0;
-    a->pipe_to = 0;
-    a->piped_from = 0;
-    a->and_to = 0;
-    a->and_from = 0;
-    a->or_to = 0;
-    a->or_from = 0;
-    a->next_cmd = 0;
-    a->prev_cmd = 0;
+    clear_cmd(a);
     parse_cmdlist(a);
 
     return a;

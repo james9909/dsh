@@ -44,14 +44,35 @@ void handle_aliases(Command *c)
         {
             Command *a = parse(aliases[1][i]);
             int j;
-            for (j = 1; j < a->argc; ++j)
+            for (j = 1; j < c->argc; ++j)
             {
                 c->argv[j+a->argc-1] = c->argv[j];
-                c->argc++;
             }
+            /* c->argv[j+a->argc-1] = 0; */
+            c->argc += a->argc - 1;
             for (j = 0; j < a->argc; ++j)
             {
-                c->argv[j] = a->argv[j];
+                c->argv[j] = strdup(a->argv[j]);
+            }
+            if (a->pipe_to)
+            {
+                c->pipe_to = a->pipe_to;
+                a->pipe_to = 0;
+            }
+            if (a->and_to)
+            {
+                c->and_to = a->and_to;
+                a->and_to = 0;
+            }
+            if (a->or_to)
+            {
+                c->or_to = a->or_to;
+                a->or_to = 0;
+            }
+            if (a->next_cmd)
+            {
+                c->next_cmd = a->next_cmd;
+                a->next_cmd = 0;
             }
             free_cmds(a);
         }

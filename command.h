@@ -31,7 +31,10 @@ typedef struct _Command
     struct _Command *prev_cmd;
 } Command;
 
+void clear_cmd(Command *c);
 void handle_redirects(Command *c);
 void handle_pipes(Command *c);
 void expand(Command *c);
 Command *next_cmd(Command *c);
+void free_cmds(Command *c);
+void print_cmds(Command *c);

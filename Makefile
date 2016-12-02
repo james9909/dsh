@@ -13,7 +13,7 @@ all:
 	gcc $(FILES) $(LIBS) -o dsh
 
 debug:
-	gcc $(FILES) $(LIBS) -g -DDEBUG -o dsh
+	gcc $(FILES) $(LIBS) -g -o dsh
 
 .PHONY: parser
 parser:

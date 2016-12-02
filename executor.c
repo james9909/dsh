@@ -22,6 +22,7 @@ void exec(Command *c)
     }
     expand(c);
 
+    handle_aliases(c);
     if (is_builtin(c))
     {
         handle_builtins(c);
@@ -31,7 +32,6 @@ void exec(Command *c)
         pid = fork();
         if (pid == 0) //child
         {
-            handle_aliases(c);
             handle_redirects(c);
             handle_pipes(c);
             execvp(c->argv[0], c->argv);
