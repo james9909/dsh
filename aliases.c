@@ -48,7 +48,6 @@ void handle_aliases(Command *c)
             {
                 c->argv[j+a->argc-1] = c->argv[j];
             }
-            /* c->argv[j+a->argc-1] = 0; */
             c->argc += a->argc - 1;
             for (j = 0; j < a->argc; ++j)
             {

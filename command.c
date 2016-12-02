@@ -104,6 +104,7 @@ void expand(Command *c)
         glob(copy[i], flags, NULL, &globbuf);
         for (j = 0; j < globbuf.gl_pathc; ++j)
         {
+            free(c->argv[argc]);
             c->argv[argc++] = strdup(globbuf.gl_pathv[j]);
         }
         globfree(&globbuf);
