@@ -51,7 +51,6 @@ void handle_aliases(Command *c)
             c->argc += a->argc - 1;
             for (j = 0; j < a->argc; ++j)
             {
-                free(c->argv[j]);
                 c->argv[j] = strdup(a->argv[j]);
             }
             if (a->pipe_to)
