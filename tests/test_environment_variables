@@ -1,0 +1,6 @@
+echo Testing environment variables...
+PROMPT="{pwd} $"
+MY_ENV_VAR="Hello, World!"
+env | grep MY_ENV_VAR || exit 1
+MY_ENV_VAR="something else"
+env | grep MY_ENV_VAR || exit 1
