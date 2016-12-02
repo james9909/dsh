@@ -43,17 +43,18 @@ void handle_aliases(Command *c)
         if (strcmp(c->argv[0], aliases[0][i]) == 0)
         {
             Command *a = parse(aliases[1][i]);
-            int j;
-            for (j = 1; j < c->argc; ++j)
+            int i;
+            for (i = 1; i < a->argc; ++i)
             {
-                c->argv[j+a->argc-1] = c->argv[j];
+                c->argv[i+a->argc-1] = c->argv[i];
+            }
+            free(c->argv[0]);
+            for (i = 0; i < a->argc; ++i)
+            {
+                c->argv[i] = strdup(a->argv[i]);
             }
             c->argc += a->argc - 1;
-            free(c->argv[0]);
-            for (j = 0; j < a->argc; ++j)
-            {
-                c->argv[j] = strdup(a->argv[j]);
-            }
+            printf("argc: %d\n", c->argc);
             if (a->pipe_to)
             {
                 c->pipe_to = a->pipe_to;
