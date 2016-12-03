@@ -205,6 +205,12 @@ int parse_cmdlist(Command *a);
 
 /* Parses a line representing the user's input, and returns a Command */
 Command *parse(chat *input);
+
+/* Parses a command as an if statement */
+int parse_if(Command *c);
+
+/* Parses a statement */
+int parse_statement(Command *c);
 ```
 
 `command.c`
@@ -212,6 +218,10 @@ Command *parse(chat *input);
 Makes up a command class.
 
 ```c
+
+/* Recursively sets dont_wait on every child Command */
+void apply_dont_wait(Command *c);
+
 /* Zeroes out all the fields in a Command */
 void clear_cmd(Command *c);
 
