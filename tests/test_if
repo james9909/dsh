@@ -1,0 +1,3 @@
+echo "Testing ifs"
+if [ 1 -eq 1 ]; then echo "This should run"; fi
+if [ 1 -eq 0 ]; then echo "This should not run"; fi
