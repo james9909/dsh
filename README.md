@@ -13,7 +13,7 @@ Features:
 * Support for aliases
 * Support for setting environment variables
 * Configuration file for aliases and prompt
-* Support for running commands in the background with '&'
+* Support for running commands in the background with `&`, and bringing them to the foreground with `fg`
 * Recursive descent parser
 
 TODO:
@@ -21,6 +21,7 @@ TODO:
 Attempted:
 
 Bugs:
+* `&` does not work properly if a command requires user interaction and is run in the terminal. Ex: works for `firefox` and `sleep`, but not `vim`.
 
 Files & Function Headers:
 
@@ -129,6 +130,9 @@ Handles the execution of commands
 
 ```c
 
+/* Returns the pid of the currently running process */
+int get_pid();
+
 /* Executes a single command */
 void exec(Command *c);
 
@@ -196,14 +200,36 @@ int parse_connector(Command *a);
 /* Parse ;. Update current command to the new one. */
 int parse_cmdlist(Command *a);
 
-/* Free all Commands linked forwardly */
+/* Parses a line representing the user's input, and returns a Command */
+Command *parse(chat *input);
+```
+
+`command.c`
+
+Makes up a command class.
+
+```c
+/* Zeroes out all the fields in a Command */
+void clear_cmd(Command *c);
+
+/* Sets up file descriptors for redirection */
+void handle_redirects(Command *c);
+
+/* Returns the next command to be run after the given one */
+Command *next_cmd(Command *c);
+
+/* Expands all the arguments inside the argv field. Must be freed manually */
+void expand(Command *c);
+
+/* Sets up file descriptors for pipes */
+void handle_pipes(Command *c);
+
+/* Frees all allocated memory within a Command */
 void free_cmds(Command *c);
 
-/* DEBUG. Print all fields in a Command */
+/* Prints all fields in a single Command */
 void print_cmd(Command *c);
 
-/* DEBUG. Print all fields of all linked Commands */
+/* Recursively prints out all Commands */
 void print_cmds(Command *c);
-
-/* Parse input */
-void parse(chat *input);
+```

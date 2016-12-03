@@ -2,6 +2,8 @@ echo Testing redirection...
 ls > /dev/null
 ls 2> /dev/null
 ls &> /dev/null
+echo 1 >&1
+echo 1 >&2
 echo 1 > file
 echo 2 >> file
 cat < file

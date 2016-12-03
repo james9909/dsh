@@ -23,7 +23,6 @@ int get_exit_code()
 
 void load_prompt()
 {
-    PROMPT = "{GREEN}[{time}] {RED}{username}{RESET}@{MAGENTA}{host} {BLUE}[{pwd}] {GREEN}{git_info} {sign}{RESET} "; // TODO: read from file?
     PROMPT = getenv("PROMPT");
     int i, lb, rb;
     for (i = lb = rb = 0; i < strlen(PROMPT); i++)

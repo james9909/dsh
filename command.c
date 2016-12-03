@@ -47,7 +47,6 @@ void handle_redirects(Command *c)
     if (c->stdout_redir)
     {
         dup2(c->stdout_redir, STDOUT_FILENO);
-        //close(c->stdout_redir);
     }
     if (*c->stdout_redir_f)
     {
@@ -59,7 +58,6 @@ void handle_redirects(Command *c)
     if (c->stderr_redir)
     {
         dup2(c->stderr_redir, STDERR_FILENO);
-        //close(c->stderr_redir);
     }
     if (*c->stderr_redir_f)
     {
