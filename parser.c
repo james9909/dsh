@@ -418,6 +418,7 @@ int parse_if(Command *c)
         return 0;
     ignore_whitespace();
     c->argv[0] = strdup("if");
+    c->argc = 1;
 
     char t[512] = {};
     int i = 0;
