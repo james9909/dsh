@@ -94,7 +94,7 @@ void handle_builtins(Command *c)
     }
     if (strcmp(c->argv[0], "if") == 0)
     {
-        run(c->condition);
+        exec(c->condition);
         if (get_exit_code() == 0)
         {
             run(c->cond_cmd);

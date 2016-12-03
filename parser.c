@@ -398,7 +398,11 @@ int parse_cmdlist(Command *a)
         {
             ignore_whitespace();
             Command *b = (Command*)calloc(1, sizeof(Command));
-            parse_connector(b);
+            if (!parse_connector(b))
+            {
+                free(b);
+                continue;
+            }
             a->next_cmd = b;
             b->prev_cmd = a;
            a = b;
