@@ -14,6 +14,11 @@
 
 pid_t pid = -1;
 
+int get_pid()
+{
+    return pid;
+}
+
 int exec(Command *c)
 {
     if (c->argv[0] == NULL)
@@ -52,8 +57,13 @@ int exec(Command *c)
             {
                 set_exit_code(WEXITSTATUS(exit_code));
             }
+            pid = -1;
         }
-        pid = -1;
+        else
+        {
+            int status;
+            waitpid(-1, &status, WNOHANG);
+        }
 
         if (c->pipe_in)
         {

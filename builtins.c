@@ -6,6 +6,8 @@
 #include <string.h>
 #include <wordexp.h>
 #include <assert.h>
+#include <signal.h>
+#include <wait.h>
 
 #include "command.h"
 #include "executor.h"
@@ -25,7 +27,8 @@ int is_builtin(Command *c)
     char *cmd = c->argv[0];
     if (strcmp(cmd, "cd") == 0
      || strcmp(cmd, "exit") == 0
-     || strcmp(cmd, "alias") == 0)
+     || strcmp(cmd, "alias") == 0
+     || strcmp(cmd, "fg") == 0)
         return 1;
     if (c->argc > 1 && strcmp(c->argv[1], "=") == 0)
         return 1;
@@ -68,6 +71,13 @@ void handle_builtins(Command *c)
             printf("cd: %s: %s\n", strerror(errno), path);
         }
         free(path);
+        return;
+    }
+    if (strcmp(c->argv[0], "fg") == 0)
+    {
+        signal_process(SIGCONT);
+        int status;
+        waitpid(get_pid(), &status, 0);
         return;
     }
     if (strcmp(c->argv[0], "alias") == 0)

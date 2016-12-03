@@ -21,11 +21,17 @@ static void handler(int signo)
 {
     if (signo == SIGINT)
     {
+        signal_process(signo);
         printf("\n");
         siglongjmp(ctrlc, 1);
         exit(0);
     }
-    signal_process(signo);
+    else if (signo == SIGCHLD)
+    {
+        pid_t pid;
+        int status;
+        pid = waitpid(-1, &status, WNOHANG);
+    }
 }
 
 void load_config()
@@ -49,6 +55,7 @@ void load_config()
 int main()
 {
     signal(SIGINT, handler);
+    signal(SIGCHLD, handler);
 
     char *input;
     char *prompt;
