@@ -31,6 +31,8 @@ void clear_cmd(Command *c)
     c->or_from = 0;
     c->next_cmd = 0;
     c->prev_cmd = 0;
+    c->condition = 0;
+    c->cond_cmd = 0;
     c->abort = 0;
 }
 
@@ -163,6 +165,7 @@ void print_cmd(Command *c)
            c->stdin_redir_f, c->stdout_redir, c->stderr_redir,
            c->stdout_redir_f, c->stderr_redir_f,
            c->stdout_append, c->stderr_append);
+    printf("Don't wait: %d\n", c->dont_wait);
     printf("Pipes to: %p\n", c->pipe_to);
     printf("Piped from: %p\n", c->piped_from);
     printf("And to: %p\n", c->and_to);
@@ -171,6 +174,9 @@ void print_cmd(Command *c)
     printf("Or from: %p\n", c->or_from);
     printf("Next cmd: %p\n", c->next_cmd);
     printf("Prev cmd: %p\n", c->prev_cmd);
+    printf("Abort: %d\n", c->abort);
+    printf("Condition: %p\n", c->condition);
+    printf("Cond Cmd: %p\n", c->cond_cmd);
     printf("-----------------------------\n");
 }
 
@@ -183,4 +189,19 @@ void print_cmds(Command *c)
     print_cmds(c->and_to);
     print_cmds(c->or_to);
     print_cmds(c->next_cmd);
+    print_cmds(c->condition);
+    print_cmds(c->cond_cmd);
+}
+
+void apply_dont_wait(Command *c)
+{
+    if (c == NULL)
+        return;
+    c->dont_wait = 1;
+    apply_dont_wait(c->pipe_to);
+    apply_dont_wait(c->and_to);
+    apply_dont_wait(c->or_to);
+    apply_dont_wait(c->next_cmd);
+    apply_dont_wait(c->condition);
+    apply_dont_wait(c->cond_cmd);
 }

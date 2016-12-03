@@ -4,7 +4,10 @@
 #include <unistd.h>
 #include "command.h"
 
+int parse_word(char **dst);
 int parse_cmdlist();
+int parse_statement(Command *c);
+Command *parse(char *input);
 
 char *p;
 char *p_end;
@@ -35,7 +38,6 @@ void ignore_whitespace()
 {
     while (accept(' ') || accept('\t') || accept('\r'));
 }
-
 void expect(char c)
 {
     if (p[0] == c)
@@ -355,12 +357,6 @@ int parse_connector(Command *a)
     if (parse_pipe(&a))
     {
         ignore_whitespace();
-        if (p[0] == '&' && p[1] != '&')
-        {
-            p++;
-            ignore_whitespace();
-            a->dont_wait = 1;
-        }
         while (accepts("&&"))
         {
             ignore_whitespace();
@@ -392,6 +388,12 @@ int parse_cmdlist(Command *a)
     if (parse_connector(a))
     {
         ignore_whitespace();
+        if (p[0] == '&' && p[1] != '&')
+        {
+            p++;
+            ignore_whitespace();
+            a->dont_wait = 1;
+        }
         while (accept(';'))
         {
             ignore_whitespace();
@@ -399,8 +401,79 @@ int parse_cmdlist(Command *a)
             parse_connector(b);
             a->next_cmd = b;
             b->prev_cmd = a;
-            a = b;
+           a = b;
         }
+        return 1;
+    }
+    return 0;
+}
+
+int parse_if(Command *c)
+{
+    if (!accepts("if"))
+        return 0;
+    ignore_whitespace();
+    c->argv[0] = strdup("if");
+
+    char t[512] = {};
+    int i = 0;
+    while (!accepts("then"))
+    {
+        if (p >= p_end)
+        {
+            fprintf(stderr, "dsh: No corresponding `then` for `if` block\n");
+            c->abort = 1;
+            return 1;
+        }
+        t[i++] = p[0];
+        p++;
+    }
+    c->condition = (Command*)malloc(sizeof(Command));
+    clear_cmd(c->condition);
+
+    char *bkp = p;
+    char *bkp_end = p_end;
+    p = t;
+    p_end = strchr(t, '\0');
+    parse_statement(c->condition);
+    p = bkp;
+    p_end = bkp_end;
+    memset(t, 0, sizeof(t));
+
+    i = 0;
+    while (!accepts("fi"))
+    {
+        if (p >= p_end)
+        {
+            fprintf(stderr, "dsh: `if` never closed.\n");
+            c->abort = 1;
+            return 1;
+        }
+        t[i++] = p[0];
+        p++;
+    }
+    c->cond_cmd = (Command*)malloc(sizeof(Command));
+    clear_cmd(c->cond_cmd);
+
+    bkp = p;
+    bkp_end = p_end;
+    p = t;
+    p_end = strchr(t, '\0');
+    parse_statement(c->cond_cmd);
+    p = bkp;
+    p_end = bkp_end;
+    return 1;
+}
+
+
+int parse_statement(Command *c)
+{
+    if (parse_if(c))
+    {
+        return 1;
+    }
+    if (parse_cmdlist(c))
+    {
         return 1;
     }
     return 0;
@@ -416,13 +489,13 @@ Command *parse(char *input)
 
     Command *a = (Command*)calloc(1, sizeof(Command));
     clear_cmd(a);
-    parse_cmdlist(a);
-
-    return a;
+    parse_statement(a);
 
 #ifdef DEBUG
     print_cmds(a);
 #endif
+
+    return a;
 }
 
 #ifdef PARSER_ALONE

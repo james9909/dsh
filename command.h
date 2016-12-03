@@ -32,6 +32,9 @@ typedef struct _Command
     struct _Command *next_cmd;
     struct _Command *prev_cmd;
 
+    struct _Command *condition;
+    struct _Command *cond_cmd;
+
     int abort;
 } Command;
 
@@ -42,3 +45,4 @@ void expand(Command *c);
 Command *next_cmd(Command *c);
 void free_cmds(Command *c);
 void print_cmds(Command *c);
+void apply_dont_wait(Command *c);

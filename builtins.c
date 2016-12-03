@@ -13,6 +13,7 @@
 #include "executor.h"
 #include "builtins.h"
 #include "aliases.h"
+#include "prompt.h"
 
 void expand_path(char **arg)
 {
@@ -28,7 +29,8 @@ int is_builtin(Command *c)
     if (strcmp(cmd, "cd") == 0
      || strcmp(cmd, "exit") == 0
      || strcmp(cmd, "alias") == 0
-     || strcmp(cmd, "fg") == 0)
+     || strcmp(cmd, "fg") == 0
+     || strcmp(cmd, "if") == 0)
         return 1;
     if (c->argc > 1 && strcmp(c->argv[1], "=") == 0)
         return 1;
@@ -90,6 +92,14 @@ void handle_builtins(Command *c)
         add_alias(c->argv[1], c->argv[3]);
         return;
     }
+    if (strcmp(c->argv[0], "if") == 0)
+    {
+        run(c->condition);
+        if (get_exit_code() == 0)
+        {
+            run(c->cond_cmd);
+        }
+    }
     if (c->argc > 1 && strcmp(c->argv[1], "=") == 0)
     {
         if (c->argc < 3)
@@ -100,5 +110,4 @@ void handle_builtins(Command *c)
         setenv(c->argv[0], c->argv[2], 1);
         return;
     }
-    assert(0); //if triggered, is_builtin is not right
 }

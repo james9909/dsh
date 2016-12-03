@@ -28,6 +28,7 @@ int exec(Command *c)
     expand(c);
 
     handle_aliases(c);
+    //print_cmds(c);
     if (c->abort)
     {
         fprintf(stderr, "dsh: Aborting...\n");
@@ -95,6 +96,10 @@ void run(Command *c)
             pipe(pfds);
             i->pipe_out = pfds[1];
             i->pipe_to->pipe_in = pfds[0];
+        }
+        if (i->dont_wait)
+        {
+            apply_dont_wait(i);
         }
         valid = exec(i);
         i = next_cmd(i);
