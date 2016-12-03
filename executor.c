@@ -21,7 +21,7 @@ int get_pid()
 
 int exec(Command *c)
 {
-    if (c->argv[0] == NULL)
+    if (c->argc == 0 || c->argv[0] == NULL)
     {
         return 0;
     }

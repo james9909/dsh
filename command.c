@@ -136,6 +136,8 @@ void free_cmds(Command *c)
     free_cmds(c->and_to);
     free_cmds(c->or_to);
     free_cmds(c->next_cmd);
+    free_cmds(c->condition);
+    free_cmds(c->cond_cmd);
     int i;
     for (i = 0; i < c->argc; ++i)
     {
