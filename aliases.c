@@ -9,6 +9,15 @@
 char aliases[2][512][512] = {};
 int max = 0;
 
+void print_aliases()
+{
+    int i;
+    for (i = 0; i < max; ++i)
+    {
+        printf("%s=\"%s\"\n", aliases[0][i], aliases[1][i]);
+    }
+}
+
 int find_alias(char *name)
 {
     int i;

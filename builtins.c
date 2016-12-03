@@ -84,6 +84,11 @@ void handle_builtins(Command *c)
     }
     if (strcmp(c->argv[0], "alias") == 0)
     {
+        if (c->argc == 1)
+        {
+            print_aliases();
+            return;
+        }
         if (c->argc < 4)
         {
             fprintf(stderr, "alias: Syntax error.\n");

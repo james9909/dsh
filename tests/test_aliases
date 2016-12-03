@@ -3,3 +3,4 @@ alias c="ls --color"
 c
 alias c="echo"
 c "heyo"
+alias

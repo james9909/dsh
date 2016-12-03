@@ -15,6 +15,7 @@ Features:
 * Configuration file for aliases and prompt
 * Support for running commands in the background with `&`, and bringing them to the foreground with `fg`
 * Recursive descent parser
+* Supports conditionals: ||, &&, if
 
 TODO:
 
@@ -22,6 +23,8 @@ Attempted:
 
 Bugs:
 * `&` does not work properly if a command requires user interaction and is run in the terminal. Ex: works for `firefox` and `sleep`, but not `vim`.
+
+Check the tests/ directory for examples, capabilities, and syntax.
 
 Files & Function Headers:
 
