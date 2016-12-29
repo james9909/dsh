@@ -28,8 +28,7 @@ int exec(Command *c)
     expand(c);
 
     handle_aliases(c);
-    /* print_cmds(c); */
-    /* printf("-------------------\n"); */
+    //print_cmds(c);
     if (c->abort)
     {
         fprintf(stderr, "dsh: Aborting...\n");
